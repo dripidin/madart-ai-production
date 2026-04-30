@@ -75,7 +75,7 @@ class AnimatedFooter {
         
         <div class="footer-logo-animation">
           <div class="footer-logo-wrapper">
-            <img src="images/WHITE LOGO.png" alt="MADART" class="footer-logo-image">
+            <img src="public/images/WHITE LOGO.png" alt="MADART" class="footer-logo-image">
             <div class="footer-logo-text">
               <span class="footer-logo-line line-1">
                 ${['M', 'A', 'D', 'E', 'A', 'R', 'T'].map((char, index) => `
