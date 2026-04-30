@@ -8,7 +8,7 @@
 // ============================================
 const CONFIG = {
     totalFrames: 327, // frame_000000 to frame_000326
-    framePath: 'frames/frame_',
+    framePath: 'public/frames/frame_',
     frameExtension: '.jpg',
     preloadBatch: 10,
     scrollSpeed: 1,
