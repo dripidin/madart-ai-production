@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     new CardNav(el, {
       items,
-      logo: el.dataset.cardNavLogo || 'public/images/LOGO BLACK.png',
+      logo: el.dataset.cardNavLogo || 'images/LOGO BLACK.png',
       logoAlt: el.dataset.cardNavLogoAlt || 'MADEART',
       baseColor: el.dataset.cardNavBaseColor || 'rgba(255, 255, 255, 0.95)',
       menuColor: el.dataset.cardNavMenuColor || '#000000',
