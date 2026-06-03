@@ -1,0 +1,26 @@
+{
+  "name": "madart-ai-production",
+  "version": "1.0.0",
+  "description": "MADART - AI Production Website",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build needed'",
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "ai",
+    "production",
+    "video",
+    "creative",
+    "portfolio"
+  ],
+  "author": "Bidjou",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}
