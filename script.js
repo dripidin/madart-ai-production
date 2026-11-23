@@ -10,6 +10,7 @@ const CONFIG = {
     totalFrames: 327, // frame_000000 to frame_000326
     framePath: 'public/frames/frame_',
     frameExtension: '.webp',
+    frameQuery: '?v=2',
     preloadBatch: 10,
     scrollSpeed: 1,
 };
@@ -261,7 +262,7 @@ class FrameScroller {
         this.activeLoads++;
 
         const frameNumber = index.toString().padStart(6, '0');
-        const url = `${CONFIG.framePath}${frameNumber}${CONFIG.frameExtension}`;
+        const url = `${CONFIG.framePath}${frameNumber}${CONFIG.frameExtension}${CONFIG.frameQuery || ''}`;
 
         try {
             if (typeof fetch === 'function' && typeof createImageBitmap === 'function') {
@@ -315,7 +316,9 @@ class FrameScroller {
             this.preloaderBar.style.width = `${percent}%`;
         }
         if (this.preloaderCounter) {
-            this.preloaderCounter.textContent = `${count} / ${total} key frames`;
+            this.preloaderCounter.textContent = percent >= 100
+                ? '327 frames ready'
+                : `Preparing scene · ${percent}%`;
         }
         if (this.preloaderPercent) {
             this.preloaderPercent.textContent = `${percent}%`;

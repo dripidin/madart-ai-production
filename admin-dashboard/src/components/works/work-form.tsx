@@ -168,22 +168,20 @@ export default function WorkForm() {
             <button
               type="button"
               onClick={() => setSourceType("youtube")}
-              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
-                sourceType === "youtube"
+              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${sourceType === "youtube"
                   ? "bg-primary-500 text-white shadow"
                   : "text-text-secondary hover:text-text-primary"
-              }`}
+                }`}
             >
               YouTube Video Link (Autoplay Muted)
             </button>
             <button
               type="button"
               onClick={() => setSourceType("upload")}
-              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${
-                sourceType === "upload"
+              className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition ${sourceType === "upload"
                   ? "bg-primary-500 text-white shadow"
                   : "text-text-secondary hover:text-text-primary"
-              }`}
+                }`}
             >
               Upload Video File (uploads/)
             </button>
@@ -416,7 +414,13 @@ export default function WorkForm() {
                 className="h-full w-full object-cover"
               />
             ) : effectiveThumb ? (
-              <img src={effectiveThumb} alt="Thumbnail" className="h-full w-full object-cover" />
+              <img
+                src={effectiveThumb}
+                alt="Thumbnail"
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
             ) : (
               <div className="flex h-full items-center justify-center text-xs text-white/50">
                 Paste a YouTube link or upload a video to preview muted autoplay playback

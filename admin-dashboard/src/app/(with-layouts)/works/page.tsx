@@ -117,11 +117,10 @@ export default function WorksCatalogPage() {
               key={cat}
               type="button"
               onClick={() => setCategoryFilter(cat)}
-              className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition ${
-                categoryFilter === cat
-                  ? "border-primary-500 bg-primary-500 text-white"
-                  : "border-card-border bg-card-background text-text-secondary hover:text-text-primary"
-              }`}
+              className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition ${categoryFilter === cat
+                ? "border-primary-500 bg-primary-500 text-white"
+                : "border-card-border bg-card-background text-text-secondary hover:text-text-primary"
+                }`}
             >
               {cat}
             </button>
@@ -171,10 +170,17 @@ export default function WorksCatalogPage() {
                       muted
                       loop
                       playsInline
+                      preload="metadata"
                       className="h-full w-full object-cover"
                     />
                   ) : thumb ? (
-                    <img src={thumb} alt={work.title} className="h-full w-full object-cover" />
+                    <img
+                      src={thumb}
+                      alt={work.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                    />
                   ) : null}
 
                   <div className="absolute top-3 left-3 flex gap-1.5">

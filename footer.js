@@ -104,7 +104,7 @@ class AnimatedFooter {
     const DEFAULT_CPP = [
       { handle: '@YouArtStudio', url: 'https://x.com/YouArtStudio', platform: 'x' },
       { handle: '@ImagineArt_X', url: 'https://x.com/ImagineArt_X', platform: 'x' },
-      { handle: '@yesand_ai',    url: 'https://x.com/yesand_ai',    platform: 'x' },
+      { handle: '@yesand_ai', url: 'https://x.com/yesand_ai', platform: 'x' },
     ];
 
     const getPlatformIcon = (platform) => {
@@ -158,7 +158,7 @@ class AnimatedFooter {
         if (Array.isArray(cached.cpp) && cached.cpp.length > 0) {
           cpp = cached.cpp;
         }
-      } catch (__) {}
+      } catch (__) { }
     }
 
     // Render footer CPP links
@@ -187,14 +187,10 @@ class AnimatedFooter {
   }
 
   setupIntersectionObserver() {
-    console.log('Setting up IntersectionObserver for footer');
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
-          console.log('Intersection entry:', entry.isIntersecting, entry.target);
           if (entry.isIntersecting) {
-            console.log('Footer in view, starting animation');
             this.animateLogo();
             observer.unobserve(entry.target);
           }
@@ -205,30 +201,23 @@ class AnimatedFooter {
 
     // Observe the entire footer element
     observer.observe(this.element);
-    console.log('Observing footer element:', this.element);
   }
 
   animateLogo() {
-    console.log('Animating logo, finding characters...');
     const chars = this.element.querySelectorAll('.footer-logo-char');
-    console.log('Found characters:', chars.length);
 
     if (chars.length === 0) {
-      console.error('No characters found to animate');
       return;
     }
 
-    chars.forEach((char, index) => {
+    chars.forEach((char) => {
       const lineIndex = parseInt(char.dataset.line) || 1;
       const charIndex = parseInt(char.dataset.index) || 0;
       // Line 2 starts after line 1 completes
       const delay = lineIndex === 1 ? charIndex * 50 : (7 * 50) + (charIndex * 50);
 
-      console.log(`Animating char ${index} (line ${lineIndex}, char ${charIndex}) with delay ${delay}ms`);
-
       // Staggered spring animation
       setTimeout(() => {
-        console.log(`Starting animation for char ${index}`);
         char.animate([
           { transform: 'translateY(100%)', opacity: 0 },
           { transform: 'translateY(0)', opacity: 1 }
@@ -242,46 +231,11 @@ class AnimatedFooter {
   }
 }
 
-// Debug: Check if footer exists
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM loaded, looking for footer elements...');
   const footerElements = document.querySelectorAll('[data-animated-footer]');
-  console.log('Found footer elements:', footerElements.length);
-
-  if (footerElements.length === 0) {
-    console.error('No [data-animated-footer] elements found!');
-  }
-
-  footerElements.forEach((el, i) => {
-    console.log(`Initializing footer ${i}:`, el);
+  footerElements.forEach((el) => {
     new AnimatedFooter(el);
   });
-
-  // Fallback: trigger animation after 2 seconds if observer fails
-  setTimeout(() => {
-    console.log('Fallback: Checking if animations ran...');
-    const chars = document.querySelectorAll('.footer-logo-char');
-    const firstChar = chars[0];
-    if (firstChar) {
-      const computed = window.getComputedStyle(firstChar);
-      console.log('First char opacity:', computed.opacity);
-      if (computed.opacity === '0') {
-        console.log('Animation may not have run, triggering manually');
-        chars.forEach((char, index) => {
-          setTimeout(() => {
-            char.animate([
-              { transform: 'translateY(100%)', opacity: 0 },
-              { transform: 'translateY(0)', opacity: 1 }
-            ], {
-              duration: 800,
-              easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-              fill: 'forwards'
-            });
-          }, index * 50);
-        });
-      }
-    }
-  }, 2000);
 });
 
 // Export
