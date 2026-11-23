@@ -28,13 +28,14 @@ export default function NotificationsPage() {
   const [filterType, setFilterType] = useState("all");
   const [unreadCount, setUnreadCount] = useState(0);
 
-  const load = () => {
-    fetch(`/api/notifications?type=${encodeURIComponent(filterType)}`, {
+  const fetchNotifications = (type: string, signal?: AbortSignal) => {
+    fetch(`/api/notifications?type=${encodeURIComponent(type)}`, {
       credentials: "include",
+      signal,
     })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data && Array.isArray(data.notifications)) {
+        if (!signal?.aborted && data && Array.isArray(data.notifications)) {
           setItems(data.notifications);
           setUnreadCount(Number(data.unreadCount || 0));
         }
@@ -42,8 +43,14 @@ export default function NotificationsPage() {
       .catch(() => {});
   };
 
+  const load = () => {
+    fetchNotifications(filterType);
+  };
+
   useEffect(() => {
-    load();
+    const controller = new AbortController();
+    fetchNotifications(filterType, controller.signal);
+    return () => controller.abort();
   }, [filterType]);
 
   async function markAllRead() {

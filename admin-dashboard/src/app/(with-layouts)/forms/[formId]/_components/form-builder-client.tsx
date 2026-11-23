@@ -232,18 +232,30 @@ export default function FormBuilderClient({ formId }: { formId: string }) {
   const [previewErrors, setPreviewErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    setLoading(true);
+    const controller = new AbortController();
+    Promise.resolve().then(() => {
+      if (!controller.signal.aborted) setLoading(true);
+    });
     fetch(`/api/forms?formId=${encodeURIComponent(rawFormId)}`, {
       credentials: "include",
+      signal: controller.signal,
     })
       .then((r) => (r.ok ? r.json() : { fields: [] }))
       .then((data) => {
+        if (controller.signal.aborted) return;
         setFields(Array.isArray(data.fields) ? data.fields : []);
         setPreviewValues({});
         setPreviewErrors({});
       })
-      .catch(() => toast.error("Failed to load form configuration."))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if ((err as Error)?.name !== "AbortError") {
+          toast.error("Failed to load form configuration.");
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, [rawFormId]);
 
   const handleAddField = () => {
@@ -375,7 +387,7 @@ export default function FormBuilderClient({ formId }: { formId: string }) {
             <Card className="h-64 animate-pulse p-6" />
           ) : fields.length === 0 ? (
             <Card className="p-8 text-center text-sm text-text-tertiary">
-              No fields configured yet. Click "+ Add Field" to begin.
+              No fields configured yet. Click &ldquo;+ Add Field&rdquo; to begin.
             </Card>
           ) : (
             <DragDropProvider

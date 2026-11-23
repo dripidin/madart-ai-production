@@ -37,16 +37,22 @@ export default function OtpInput({
 
   // Sync value prop from parent to local state
   useEffect(() => {
-    if (value !== undefined) {
-      const digits = value.split("").slice(0, digitLength);
-      const paddedDigits = [...digits, ...Array(digitLength - digits.length).fill("")];
+    if (value === undefined) return;
+    let cancelled = false;
+    const digits = value.split("").slice(0, digitLength);
+    const paddedDigits = [...digits, ...Array(digitLength - digits.length).fill("")];
+    queueMicrotask(() => {
+      if (cancelled) return;
       setOtp((prev) => {
         if (prev.join("") === paddedDigits.join("")) {
           return prev;
         }
         return paddedDigits;
       });
-    }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [value, digitLength]);
 
   // Sync local state changes back to parent onChange

@@ -45,6 +45,7 @@ export default function MadeArtOverviewPage() {
   const [works, setWorks] = useState<WorkItem[]>([]);
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [nowMs, setNowMs] = useState<number | null>(null);
   const [invoiceSummary, setInvoiceSummary] = useState<InvoiceSummary>({
     totalPaid: 0,
     totalPending: 0,
@@ -52,23 +53,24 @@ export default function MadeArtOverviewPage() {
   });
 
   useEffect(() => {
-    const opts: RequestInit = { credentials: "include" };
-    fetch("/api/works?includeScheduled=true", opts)
-      .then((r) => (r.ok ? r.json() : []))
-      .then((d) => Array.isArray(d) && setWorks(d))
-      .catch(() => {});
-    fetch("/api/messages", opts)
-      .then((r) => (r.ok ? r.json() : []))
-      .then((d) => Array.isArray(d) && setMessages(d))
-      .catch(() => {});
-    fetch("/api/tasks", opts)
-      .then((r) => (r.ok ? r.json() : []))
-      .then((d) => Array.isArray(d) && setTasks(d))
-      .catch(() => {});
-    fetch("/api/invoices", opts)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => d?.summary && setInvoiceSummary(d.summary))
-      .catch(() => {});
+    const controller = new AbortController();
+    const opts: RequestInit = { credentials: "include", signal: controller.signal };
+
+    Promise.all([
+      fetch("/api/works?includeScheduled=true", opts).then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch("/api/messages", opts).then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch("/api/tasks", opts).then((r) => (r.ok ? r.json() : [])).catch(() => []),
+      fetch("/api/invoices", opts).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+    ]).then(([worksData, messagesData, tasksData, invoicesData]) => {
+      if (controller.signal.aborted) return;
+      setNowMs(Date.now());
+      if (Array.isArray(worksData)) setWorks(worksData);
+      if (Array.isArray(messagesData)) setMessages(messagesData);
+      if (Array.isArray(tasksData)) setTasks(tasksData);
+      if (invoicesData?.summary) setInvoiceSummary(invoicesData.summary);
+    });
+
+    return () => controller.abort();
   }, []);
 
   const countryCounts = useMemo(() => {
@@ -82,8 +84,10 @@ export default function MadeArtOverviewPage() {
 
   const unreadMessages = messages.filter((m) => m.status === "unread").length;
   const openTasks = tasks.filter((t) => t.status !== "done").length;
-  const now = Date.now();
-  const scheduledWorks = works.filter((w) => w.publishAt && new Date(w.publishAt).getTime() > now).length;
+  const scheduledWorks =
+    nowMs === null
+      ? 0
+      : works.filter((w) => w.publishAt && new Date(w.publishAt).getTime() > nowMs).length;
 
   return (
     <div className="mt-6 space-y-6 px-2 lg:px-6">

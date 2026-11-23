@@ -27,22 +27,26 @@ export default function EmailInboxPage() {
   const [search, setSearch] = useState("");
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
-  const loadMessages = () => {
-    fetch("/api/messages", { credentials: "include" })
+  const loadMessages = (signal?: AbortSignal) => {
+    fetch("/api/messages", { credentials: "include", signal })
       .then((r) => (r.ok ? r.json() : []))
       .then((data) => {
-        if (Array.isArray(data)) {
+        if (!signal?.aborted && Array.isArray(data)) {
           setMessages(data);
-          if (!selectedId && data.length > 0) {
-            setSelectedId(data[0].id);
-          }
+          setSelectedId((prev) => prev ?? (data.length > 0 ? data[0].id : null));
         }
       })
-      .catch(() => toast.error("Failed to load inbox messages."));
+      .catch((err) => {
+        if ((err as Error)?.name !== "AbortError") {
+          toast.error("Failed to load inbox messages.");
+        }
+      });
   };
 
   useEffect(() => {
-    loadMessages();
+    const controller = new AbortController();
+    loadMessages(controller.signal);
+    return () => controller.abort();
   }, []);
 
   const filtered = useMemo(() => {

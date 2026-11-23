@@ -29,30 +29,36 @@ interface TaskItem {
 export default function ContentCalendarPage() {
   const [works, setWorks] = useState<WorkItem[]>([]);
   const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [nowMs, setNowMs] = useState<number>(0);
 
-  const loadData = () => {
-    fetch("/api/works?includeScheduled=true", { credentials: "include" })
-      .then((r) => (r.ok ? r.json() : []))
-      .then((d) => Array.isArray(d) && setWorks(d))
-      .catch(() => {});
-
-    fetch("/api/tasks", { credentials: "include" })
-      .then((r) => (r.ok ? r.json() : []))
-      .then((d) => Array.isArray(d) && setTasks(d))
-      .catch(() => {});
+  const loadData = (signal?: AbortSignal) => {
+    Promise.all([
+      fetch("/api/works?includeScheduled=true", { credentials: "include", signal })
+        .then((r) => (r.ok ? r.json() : []))
+        .catch(() => []),
+      fetch("/api/tasks", { credentials: "include", signal })
+        .then((r) => (r.ok ? r.json() : []))
+        .catch(() => []),
+    ]).then(([worksData, tasksData]) => {
+      if (signal?.aborted) return;
+      setNowMs(Date.now());
+      if (Array.isArray(worksData)) setWorks(worksData);
+      if (Array.isArray(tasksData)) setTasks(tasksData);
+    });
   };
 
   useEffect(() => {
-    loadData();
+    const controller = new AbortController();
+    loadData(controller.signal);
+    return () => controller.abort();
   }, []);
 
   const events = useMemo(() => {
-    const now = Date.now();
     const workEvents = works
       .filter((w) => w.publishAt || w.publishedAt)
       .map((w) => {
         const dt = w.publishAt || w.publishedAt || "";
-        const isScheduled = new Date(dt).getTime() > now;
+        const isScheduled = nowMs > 0 && new Date(dt).getTime() > nowMs;
         return {
           id: `work:${w.id}`,
           title: `${isScheduled ? "⏳ Scheduled" : "✅ Live"} · ${w.title}`,
@@ -75,7 +81,7 @@ export default function ContentCalendarPage() {
       }));
 
     return [...workEvents, ...taskEvents];
-  }, [works, tasks]);
+  }, [works, tasks, nowMs]);
 
   async function handleEventDrop(info: { event: { id: string; startStr: string } }) {
     if (!info.event.id.startsWith("work:")) return;

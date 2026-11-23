@@ -385,7 +385,23 @@ export default function TaskListPage() {
   };
 
   useEffect(() => {
-    fetchTasks();
+    const controller = new AbortController();
+    fetch("/api/tasks", { credentials: "include", signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!controller.signal.aborted && Array.isArray(data)) {
+          setTasks(data);
+        }
+      })
+      .catch((err) => {
+        if ((err as Error)?.name !== "AbortError") {
+          toast.error("Failed to load studio tasks.");
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, []);
 
   const allAssignees = useMemo(() => {

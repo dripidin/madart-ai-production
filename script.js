@@ -22,127 +22,235 @@ class ScrollEntrance {
         this.entrance = document.getElementById('scrollEntrance');
         this.indicator = document.getElementById('scrollIndicator');
         this.hasTransitioned = false;
+        this.isStarted = false;
         this.scrollThreshold = 50; // pixels to trigger transition
-        
+
         this.init();
     }
-    
+
     init() {
         if (!this.entrance || !this.indicator) return;
-        
-        // Wait for entrance animation to complete before binding scroll
-        setTimeout(() => {
-            this.bindEvents();
-        }, 2000); // After entrance animation (1.5s + 0.5s delay)
+
+        const preloader = document.getElementById('preloader');
+        if (!preloader || preloader.classList.contains('loaded')) {
+            this.start();
+        } else {
+            window.addEventListener('preloaderDismissed', () => this.start(), { once: true });
+        }
     }
-    
+
+    start() {
+        if (this.isStarted) return;
+        this.isStarted = true;
+        this.bindEvents();
+    }
+
     bindEvents() {
         window.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
-        
-        // Also check initial scroll position (in case user refreshed mid-page)
         this.checkScrollPosition();
     }
-    
+
     handleScroll() {
         if (this.hasTransitioned) return;
-        
+
         const scrollY = window.scrollY || window.pageYOffset;
-        
         if (scrollY > this.scrollThreshold) {
             this.transitionToBottom();
         }
     }
-    
+
     checkScrollPosition() {
         const scrollY = window.scrollY || window.pageYOffset;
-        
         if (scrollY > this.scrollThreshold) {
-            // User is already scrolled, skip entrance and show indicator
             this.entrance.classList.add('hidden');
             this.indicator.classList.add('visible');
             this.hasTransitioned = true;
         }
     }
-    
+
     transitionToBottom() {
         this.hasTransitioned = true;
-        
-        // Add transitioning class for exit animation
         this.entrance.classList.add('transitioning');
-        
-        // Show bottom indicator
         this.indicator.classList.add('visible');
-        
-        // Hide entrance after animation completes
+
         setTimeout(() => {
             this.entrance.classList.add('hidden');
             this.entrance.classList.remove('transitioning');
-        }, 800); // Match CSS animation duration
+        }, 800);
     }
 }
 
 // ============================================
-// FRAME CANVAS CONTROLLER
+// FRAME CANVAS CONTROLLER (TWO-PHASE LOADER)
 // ============================================
 class FrameScroller {
     constructor() {
         this.canvas = document.getElementById('frameCanvas');
-        this.ctx = this.canvas.getContext('2d');
+        this.ctx = this.canvas ? this.canvas.getContext('2d', { alpha: false }) : null;
         this.frames = new Map(); // index -> ImageBitmap or HTMLImageElement
         this.loadingSet = new Set();
         this.loadQueue = [];
-        this.concurrencyLimit = 16; // High concurrency for fast session startup
+        this.keyframeList = this.buildKeyframes();
+        this.keyframeSet = new Set(this.keyframeList);
+        this.maxDecodedFrames = 120;
+
+        this.phase = 1;
+        this.concurrencyLimit = 6;
         this.activeLoads = 0;
-        this.loadedCount = 0;
-        
+        this.loadedKeyframes = 0;
+
         this.preloader = document.getElementById('preloader');
         this.preloaderBar = document.getElementById('preloaderBar');
         this.preloaderCounter = document.getElementById('preloaderCounter');
         this.preloaderPercent = document.getElementById('preloaderPercent');
-        
+        this.preloaderSkip = document.getElementById('preloaderSkip');
+
         this.currentFrame = 0;
         this.targetFrame = 0;
         this.lastRenderedIndex = -1;
-        this.lastRenderedWidth = 0;
-        this.lastRenderedHeight = 0;
-        
+        this.needsRedraw = true;
+        this.rafId = null;
+        this.lastRafTime = 0;
+        this.heroScrollRange = 1;
+        this.heroInView = true;
+
         this.isLoading = true;
         this.heroSection = document.querySelector('.hero-section');
         this.scrollIndicator = document.querySelector('.scroll-indicator');
-        
-        this.init();
+
+        if (this.canvas && this.ctx && this.heroSection) {
+            this.init();
+        } else {
+            this.dismissPreloader();
+        }
+    }
+
+    buildKeyframes() {
+        const set = new Set();
+        // Immediate opening frames for smooth initial scroll
+        for (let i = 0; i <= 6 && i < CONFIG.totalFrames; i++) {
+            set.add(i);
+        }
+        // Evenly distributed keyframes across the full 0..326 sequence
+        for (let i = 0; i < CONFIG.totalFrames; i += 12) {
+            set.add(i);
+        }
+        set.add(CONFIG.totalFrames - 1);
+        return Array.from(set).sort((a, b) => a - b);
     }
 
     init() {
+        if (this.preloader && !this.preloader.classList.contains('loaded')) {
+            document.body.classList.add('preloader-active');
+        }
         this.setupCanvas();
-        this.startInstantSessionPreload();
+        this.bindPreloaderControls();
+        this.startProgressivePreload();
         this.bindEvents();
-        this.animate();
+        this.wakeLoop();
+    }
+
+    bindPreloaderControls() {
+        if (this.preloaderSkip) {
+            this.preloaderSkip.addEventListener('click', () => this.dismissPreloader());
+            setTimeout(() => {
+                if (this.isLoading && this.preloaderSkip) {
+                    this.preloaderSkip.style.display = 'inline-block';
+                }
+            }, 2500);
+        }
+
+        // Fail-safe timeout so slow/throttled connections never lock the user behind #preloader
+        setTimeout(() => {
+            if (this.isLoading) {
+                this.dismissPreloader();
+            }
+        }, 6000);
     }
 
     setupCanvas() {
         const resize = () => {
-            this.canvas.width = window.innerWidth;
-            this.canvas.height = window.innerHeight;
-            this.lastRenderedWidth = 0;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            this.canvas.width = Math.max(1, Math.round(vw * dpr));
+            this.canvas.height = Math.max(1, Math.round(vh * dpr));
+            this.heroScrollRange = Math.max(1, (this.heroSection?.offsetHeight || vh * 3) - vh);
+            this.needsRedraw = true;
+            this.wakeLoop();
         };
         resize();
         window.addEventListener('resize', resize, { passive: true });
     }
 
-    startInstantSessionPreload() {
-        // Enqueue ALL 327 frames upfront immediately for session start
-        for (let i = 0; i < CONFIG.totalFrames; i++) {
-            this.loadQueue.push(i);
-        }
-
+    startProgressivePreload() {
+        // Phase 1: enqueue critical keyframes only (~33 frames instead of all 327)
+        this.phase = 1;
+        this.concurrencyLimit = 6;
+        this.loadQueue = [...this.keyframeList];
+        this.updateProgress();
         this.processQueue();
+    }
+
+    startBackgroundPreload() {
+        if (this.phase === 2) return;
+        this.phase = 2;
+        this.concurrencyLimit = 4;
+
+        for (let i = 0; i < CONFIG.totalFrames; i++) {
+            if (!this.frames.has(i) && !this.loadingSet.has(i) && !this.loadQueue.includes(i)) {
+                this.loadQueue.push(i);
+            }
+        }
+        this.processQueue();
+    }
+
+    dequeueNextIndex() {
+        if (this.loadQueue.length === 0) return undefined;
+        if (this.phase === 1) {
+            return this.loadQueue.shift();
+        }
+        // Phase 2: dynamically prioritize frame closest to current scroll target
+        let bestIdx = 0;
+        let bestDist = Math.abs(this.loadQueue[0] - this.targetFrame);
+        for (let i = 1; i < this.loadQueue.length; i++) {
+            const d = Math.abs(this.loadQueue[i] - this.targetFrame);
+            if (d < bestDist) {
+                bestDist = d;
+                bestIdx = i;
+                if (d === 0) break;
+            }
+        }
+        const [chosen] = this.loadQueue.splice(bestIdx, 1);
+        return chosen;
     }
 
     processQueue() {
         while (this.activeLoads < this.concurrencyLimit && this.loadQueue.length > 0) {
-            const index = this.loadQueue.shift();
+            const index = this.dequeueNextIndex();
+            if (index === undefined) break;
             this.loadFrame(index);
+        }
+    }
+
+    evictDistantFramesIfNeeded() {
+        if (this.frames.size <= this.maxDecodedFrames) return;
+        let farthestKey = null;
+        let farthestDist = -1;
+        for (const key of this.frames.keys()) {
+            if (this.keyframeSet.has(key)) continue;
+            const dist = Math.abs(key - this.targetFrame);
+            if (dist > farthestDist) {
+                farthestDist = dist;
+                farthestKey = key;
+            }
+        }
+        if (farthestKey !== null) {
+            const old = this.frames.get(farthestKey);
+            if (old && typeof old.close === 'function') {
+                try { old.close(); } catch (_) {}
+            }
+            this.frames.delete(farthestKey);
         }
     }
 
@@ -162,14 +270,16 @@ class FrameScroller {
                 const blob = await response.blob();
                 const bitmap = await createImageBitmap(blob);
                 this.frames.set(index, bitmap);
+                this.evictDistantFramesIfNeeded();
             } else {
                 await new Promise((resolve, reject) => {
                     const img = new Image();
                     img.onload = async () => {
                         if ('decode' in img) {
-                            try { await img.decode(); } catch (e) {}
+                            try { await img.decode(); } catch (_) {}
                         }
                         this.frames.set(index, img);
+                        this.evictDistantFramesIfNeeded();
                         resolve();
                     };
                     img.onerror = reject;
@@ -181,12 +291,15 @@ class FrameScroller {
         } finally {
             this.loadingSet.delete(index);
             this.activeLoads--;
-            this.loadedCount++;
 
-            this.updateProgress();
+            if (this.keyframeSet.has(index)) {
+                this.loadedKeyframes++;
+                this.updateProgress();
+            }
 
-            if (index === 0) {
-                this.renderFrame(0);
+            if (index === 0 || Math.abs(index - this.currentFrame) <= 2) {
+                this.needsRedraw = true;
+                this.wakeLoop();
             }
 
             this.processQueue();
@@ -194,93 +307,119 @@ class FrameScroller {
     }
 
     updateProgress() {
-        const total = CONFIG.totalFrames;
-        const count = this.loadedCount;
+        const total = this.keyframeList.length;
+        const count = Math.min(total, this.loadedKeyframes);
         const percent = Math.min(100, Math.round((count / total) * 100));
 
         if (this.preloaderBar) {
             this.preloaderBar.style.width = `${percent}%`;
         }
         if (this.preloaderCounter) {
-            this.preloaderCounter.textContent = `${count} / ${total} frames`;
+            this.preloaderCounter.textContent = `${count} / ${total} key frames`;
         }
         if (this.preloaderPercent) {
             this.preloaderPercent.textContent = `${percent}%`;
         }
 
-        // When 95%+ of frames are preloaded upfront into memory, dismiss loading screen
-        if (count >= total || percent >= 98) {
-            if (this.isLoading) {
-                this.isLoading = false;
-                setTimeout(() => {
-                    if (this.preloader) {
-                        this.preloader.classList.add('loaded');
-                    }
-                }, 300);
-            }
+        if (count >= total && this.isLoading) {
+            setTimeout(() => this.dismissPreloader(), 220);
         }
+    }
+
+    dismissPreloader() {
+        if (!this.isLoading && (!this.preloader || this.preloader.classList.contains('loaded'))) {
+            return;
+        }
+        this.isLoading = false;
+        document.body.classList.remove('preloader-active');
+
+        if (this.preloader) {
+            this.preloader.classList.add('loaded');
+        }
+        if (this.preloaderSkip) {
+            this.preloaderSkip.style.display = 'none';
+        }
+        if (lenis && typeof lenis.start === 'function') {
+            lenis.start();
+        }
+
+        window.dispatchEvent(new CustomEvent('preloaderDismissed'));
+        this.startBackgroundPreload();
     }
 
     bindEvents() {
         window.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
     }
 
+    updateScrollTarget(scrollY) {
+        const scrollProgress = Math.max(0, Math.min(1, scrollY / this.heroScrollRange));
+        this.heroInView = scrollY <= this.heroScrollRange + 200;
+
+        const nextTarget = Math.round(scrollProgress * (CONFIG.totalFrames - 1));
+        if (nextTarget !== this.targetFrame) {
+            this.targetFrame = nextTarget;
+            if (this.phase === 2 && !this.frames.has(nextTarget) && !this.loadingSet.has(nextTarget) && !this.loadQueue.includes(nextTarget)) {
+                this.loadQueue.unshift(nextTarget);
+                this.processQueue();
+            }
+        }
+
+        window.dispatchEvent(new CustomEvent('frameScrollProgress', {
+            detail: { progress: scrollProgress }
+        }));
+
+        if (scrollProgress > 0.95) {
+            this.scrollIndicator?.classList.add('hidden');
+        } else {
+            this.scrollIndicator?.classList.remove('hidden');
+        }
+
+        this.wakeLoop();
+    }
+
     handleScroll() {
         if (lenis) return;
-        
-        const scrollY = window.scrollY;
-        const heroHeight = this.heroSection.offsetHeight;
-        const windowHeight = window.innerHeight;
-        
-        const scrollProgress = Math.max(0, Math.min(1, scrollY / (heroHeight - windowHeight)));
-        this.targetFrame = Math.floor(scrollProgress * (CONFIG.totalFrames - 1));
-
-        window.dispatchEvent(new CustomEvent('frameScrollProgress', { 
-            detail: { progress: scrollProgress }
-        }));
-        
-        if (scrollProgress > 0.95) {
-            this.scrollIndicator?.classList.add('hidden');
-        } else {
-            this.scrollIndicator?.classList.remove('hidden');
-        }
+        this.updateScrollTarget(window.scrollY || window.pageYOffset);
     }
 
-    handleLenisScroll(scroll, progress) {
-        const heroHeight = this.heroSection.offsetHeight;
-        const windowHeight = window.innerHeight;
-        
-        const scrollProgress = Math.max(0, Math.min(1, scroll / (heroHeight - windowHeight)));
-        this.targetFrame = Math.floor(scrollProgress * (CONFIG.totalFrames - 1));
-
-        window.dispatchEvent(new CustomEvent('frameScrollProgress', { 
-            detail: { progress: scrollProgress }
-        }));
-        
-        if (scrollProgress > 0.95) {
-            this.scrollIndicator?.classList.add('hidden');
-        } else {
-            this.scrollIndicator?.classList.remove('hidden');
-        }
+    handleLenisScroll(scroll) {
+        this.updateScrollTarget(scroll);
     }
 
-    animate() {
+    wakeLoop() {
+        if (this.rafId !== null) return;
+        this.lastRafTime = 0;
+        this.rafId = requestAnimationFrame((ts) => this.animate(ts));
+    }
+
+    animate(timestamp) {
+        if (!this.lastRafTime) {
+            this.lastRafTime = timestamp;
+        }
+        const dt = Math.min(0.05, Math.max(0.001, (timestamp - this.lastRafTime) / 1000));
+        this.lastRafTime = timestamp;
+
         const diff = this.targetFrame - this.currentFrame;
         if (Math.abs(diff) > 0.01) {
-            this.currentFrame += diff * 0.3;
+            const ease = 1 - Math.exp(-14 * dt);
+            this.currentFrame += diff * ease;
         } else {
             this.currentFrame = this.targetFrame;
         }
-        
+
         const frameIndex = Math.round(this.currentFrame);
-        if (frameIndex !== this.lastRenderedIndex || this.canvas.width !== this.lastRenderedWidth || this.canvas.height !== this.lastRenderedHeight) {
+        if (frameIndex !== this.lastRenderedIndex || this.needsRedraw) {
             this.renderFrame(frameIndex);
             this.lastRenderedIndex = frameIndex;
-            this.lastRenderedWidth = this.canvas.width;
-            this.lastRenderedHeight = this.canvas.height;
+            this.needsRedraw = false;
         }
-        
-        requestAnimationFrame(() => this.animate());
+
+        const settled = Math.abs(this.targetFrame - this.currentFrame) <= 0.005;
+        if (!settled && this.heroInView) {
+            this.rafId = requestAnimationFrame((ts) => this.animate(ts));
+        } else {
+            this.rafId = null;
+        }
     }
 
     findNearestLoadedFrame(targetIndex) {
@@ -295,18 +434,16 @@ class FrameScroller {
 
     renderFrame(index) {
         let frame = this.frames.get(index);
-        
+
         if (!frame) {
             frame = this.findNearestLoadedFrame(index);
         }
-        
+
         if (!frame) return;
 
         const ctx = this.ctx;
         const canvas = this.canvas;
-        
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
+
         const frameWidth = frame.width || frame.displayWidth || canvas.width;
         const frameHeight = frame.height || frame.displayHeight || canvas.height;
 
@@ -314,16 +451,13 @@ class FrameScroller {
             canvas.width / frameWidth,
             canvas.height / frameHeight
         );
-        
-        const x = (canvas.width - frameWidth * scale) / 2;
-        const y = (canvas.height - frameHeight * scale) / 2;
-        
-        ctx.drawImage(
-            frame,
-            x, y,
-            frameWidth * scale,
-            frameHeight * scale
-        );
+
+        const drawWidth = frameWidth * scale;
+        const drawHeight = frameHeight * scale;
+        const x = (canvas.width - drawWidth) / 2;
+        const y = (canvas.height - drawHeight) / 2;
+
+        ctx.drawImage(frame, x, y, drawWidth, drawHeight);
     }
 }
 
@@ -348,26 +482,29 @@ class NavigationController {
             if (!this.nav) return;
         }
         const scrollY = window.scrollY;
-        
+
         if (scrollY > 100) {
             this.nav.classList.add('scrolled');
         } else {
             this.nav.classList.remove('scrolled');
         }
-        
+
         this.lastScrollY = scrollY;
     }
 
     setupSmoothScroll() {
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', (e) => {
-                e.preventDefault();
-                const target = document.querySelector(anchor.getAttribute('href'));
+                const href = anchor.getAttribute('href');
+                if (!href || href === '#') return;
+                const target = document.querySelector(href);
                 if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                    e.preventDefault();
+                    if (lenis && typeof lenis.scrollTo === 'function') {
+                        lenis.scrollTo(target, { duration: 1.1 });
+                    } else {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 }
             });
         });
@@ -510,37 +647,43 @@ class FAQController {
 // ============================================
 class ScrollReveal {
     constructor() {
-        this.elements = document.querySelectorAll('.video-card, .faq-item, .stat-item, .form-group');
+        this.selector = '.video-card, .faq-item, .stat-item, .form-group';
+        this.observer = null;
         this.init();
     }
 
     init() {
-        // Add reveal class to elements
-        this.elements.forEach(el => el.classList.add('reveal'));
-        
-        // Create intersection observer
-        const observer = new IntersectionObserver(
-            (entries) => this.handleIntersection(entries),
-            {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
+        if (typeof IntersectionObserver !== 'undefined') {
+            this.observer = new IntersectionObserver(
+                (entries) => this.handleIntersection(entries),
+                {
+                    threshold: 0.08,
+                    rootMargin: '0px 0px -40px 0px'
+                }
+            );
+        }
+        this.observeNew();
+    }
+
+    observeNew() {
+        const elements = document.querySelectorAll(this.selector);
+        elements.forEach((el) => {
+            if (el.__hasRevealObserver) return;
+            el.__hasRevealObserver = true;
+            el.classList.add('reveal');
+            if (this.observer) {
+                this.observer.observe(el);
+            } else {
+                el.classList.add('active');
             }
-        );
-        
-        this.elements.forEach(el => observer.observe(el));
+        });
     }
 
     handleIntersection(entries) {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
-                // Add stagger delay for cards
-                const cards = entry.target.parentElement?.querySelectorAll('.video-card');
-                if (cards) {
-                    cards.forEach((card, i) => {
-                        card.style.transitionDelay = `${i * 0.1}s`;
-                    });
-                }
+                this.observer?.unobserve(entry.target);
             }
         });
     }
@@ -774,79 +917,65 @@ class FormController {
 }
 
 // ============================================
-// PARALLAX EFFECT
+// PARALLAX EFFECT (rAF-BATCHED, OFF-SCREEN CULLED)
 // ============================================
 class ParallaxController {
     constructor() {
-        this.elements = document.querySelectorAll('.about-content, .contact-content');
+        this.elements = Array.from(document.querySelectorAll('.about-content, .contact-content'));
+        this.rafPending = false;
         this.init();
     }
 
     init() {
-        window.addEventListener('scroll', () => this.handleScroll(), { passive: true });
+        if (this.elements.length === 0) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        window.addEventListener('scroll', () => this.scheduleUpdate(), { passive: true });
+    }
+
+    scheduleUpdate() {
+        if (this.rafPending) return;
+        this.rafPending = true;
+        requestAnimationFrame(() => {
+            this.rafPending = false;
+            this.handleScroll();
+        });
     }
 
     handleScroll() {
-        const scrollY = window.scrollY;
-        
-        this.elements.forEach(el => {
+        const vh = window.innerHeight;
+        const viewportCenter = vh / 2;
+
+        this.elements.forEach((el) => {
             const rect = el.getBoundingClientRect();
+            if (rect.bottom < 0 || rect.top > vh) return;
+
             const centerY = rect.top + rect.height / 2;
-            const viewportCenter = window.innerHeight / 2;
             const distance = (centerY - viewportCenter) / viewportCenter;
-            
-            // Subtle parallax movement
-            const translateY = distance * -20;
-            el.style.transform = `translateY(${translateY}px)`;
+            const translateY = distance * -18;
+            el.style.transform = `translate3d(0, ${translateY.toFixed(2)}px, 0)`;
         });
     }
 }
 
 // ============================================
-// MARQUEE SPEED CONTROLLER
-// ============================================
-class MarqueeController {
-    constructor() {
-        this.track = document.querySelector('.marquee-track');
-        this.init();
-    }
-
-    init() {
-        if (!this.track) return;
-        
-        let lastScrollY = window.scrollY;
-        let speed = 1;
-        
-        window.addEventListener('scroll', () => {
-            const scrollY = window.scrollY;
-            const delta = Math.abs(scrollY - lastScrollY);
-            
-            // Speed up marquee on fast scroll
-            if (delta > 5) {
-                speed = Math.min(3, 1 + delta / 20);
-            } else {
-                speed = Math.max(1, speed * 0.95);
-            }
-            
-            this.track.style.animationDuration = `${20 / speed}s`;
-            lastScrollY = scrollY;
-        }, { passive: true });
-    }
-}
-
-// ============================================
-// MOUSE EFFECTS
+// MOUSE EFFECTS (DESKTOP ONLY)
 // ============================================
 class MouseEffects {
     constructor() {
-        this.cards = document.querySelectorAll('.video-card');
         this.init();
     }
 
     init() {
-        this.cards.forEach(card => {
-            card.addEventListener('mousemove', (e) => this.handleMouseMove(e, card));
-            card.addEventListener('mouseleave', () => this.handleMouseLeave(card));
+        if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+        this.bindCards();
+    }
+
+    bindCards() {
+        document.querySelectorAll('.video-card').forEach((card) => {
+            if (card.__hasMouseTilt) return;
+            card.__hasMouseTilt = true;
+            card.addEventListener('mousemove', (e) => this.handleMouseMove(e, card), { passive: true });
+            card.addEventListener('mouseleave', () => this.handleMouseLeave(card), { passive: true });
         });
     }
 
@@ -854,14 +983,14 @@ class MouseEffects {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        
+
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        
-        const rotateX = (y - centerY) / 20;
-        const rotateY = (centerX - x) / 20;
-        
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+        const rotateX = (y - centerY) / 24;
+        const rotateY = (centerX - x) / 24;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
     }
 
     handleMouseLeave(card) {
@@ -870,47 +999,121 @@ class MouseEffects {
 }
 
 // ============================================
-// VIDEO SEEK CONTROLLER - Autoplay from second 5
+// VIDEO SEEK CONTROLLER - Lazy Viewport Playback
 // ============================================
 class VideoSeekController {
     constructor() {
-        this.seekTime = 5; // Start from second 5
+        this.seekTime = 5;
+        this.canHydrateMedia = false;
+        this.observer = null;
         this.init();
     }
 
     init() {
-        this.videos = document.querySelectorAll('.video-seek');
-        this.videos.forEach(video => {
-            if (video.__hasSeekListener) return;
-            video.__hasSeekListener = true;
+        if (typeof IntersectionObserver !== 'undefined') {
+            this.observer = new IntersectionObserver(
+                (entries) => this.handleIntersect(entries),
+                { rootMargin: '250px 0px', threshold: 0.01 }
+            );
+        }
 
-            // Set current time when metadata is loaded
-            video.addEventListener('loadedmetadata', () => {
-                video.currentTime = this.seekTime;
-            });
-            
-            // Also try to set it immediately (for cached videos)
-            if (video.readyState >= 2) {
-                video.currentTime = this.seekTime;
+        const preloader = document.getElementById('preloader');
+        if (!preloader || preloader.classList.contains('loaded')) {
+            this.enableMediaHydration();
+        } else {
+            window.addEventListener('preloaderDismissed', () => this.enableMediaHydration(), { once: true });
+        }
+
+        this.rebind();
+    }
+
+    enableMediaHydration() {
+        if (this.canHydrateMedia) return;
+        this.canHydrateMedia = true;
+        this.rebind();
+    }
+
+    hydrateVideo(video) {
+        const source = video.querySelector('source');
+        if (source && !source.getAttribute('src') && source.dataset.src) {
+            source.setAttribute('src', source.dataset.src);
+            video.load();
+        }
+    }
+
+    hydrateCardIframe(card) {
+        const iframe = card.querySelector('.card-youtube-autoplay');
+        if (iframe && !iframe.getAttribute('src') && iframe.dataset.src) {
+            iframe.setAttribute('src', iframe.dataset.src);
+        }
+    }
+
+    bindVideoListeners(video) {
+        if (video.__hasSeekListener) return;
+        video.__hasSeekListener = true;
+
+        const applySeek = () => {
+            const targetTime = Number.isFinite(video.duration) && video.duration > 1
+                ? Math.min(this.seekTime, Math.max(0, video.duration - 0.5))
+                : this.seekTime;
+            if (Math.abs(video.currentTime - targetTime) > 0.5) {
+                try { video.currentTime = targetTime; } catch (_) {}
             }
-            
-            // Ensure looping resets to second 5, not beginning
-            video.addEventListener('ended', () => {
-                video.currentTime = this.seekTime;
-                video.play().catch(() => {});
-            });
-            
-            // Handle timeupdate to prevent going before second 5 during loop
-            video.addEventListener('timeupdate', () => {
-                if (video.currentTime < 1 && video.played.length > 0) {
-                    video.currentTime = this.seekTime;
+        };
+
+        video.addEventListener('loadedmetadata', applySeek);
+        video.addEventListener('ended', () => {
+            applySeek();
+            video.play().catch(() => {});
+        });
+        video.addEventListener('timeupdate', () => {
+            if (video.currentTime < 1 && video.played.length > 0 && (!Number.isFinite(video.duration) || video.duration > this.seekTime + 1)) {
+                applySeek();
+            }
+        });
+    }
+
+    handleIntersect(entries) {
+        if (!this.canHydrateMedia) return;
+        entries.forEach((entry) => {
+            const card = entry.target;
+            if (card.classList.contains('is-hidden')) return;
+
+            const video = card.querySelector('.video-seek');
+            if (entry.isIntersecting) {
+                this.hydrateCardIframe(card);
+                if (video) {
+                    this.bindVideoListeners(video);
+                    this.hydrateVideo(video);
+                    video.play().catch(() => {});
                 }
-            });
+            } else if (video && !video.paused) {
+                video.pause();
+            }
         });
     }
 
     rebind() {
-        this.init();
+        const cards = document.querySelectorAll('#videoGrid .video-card');
+        cards.forEach((card) => {
+            const video = card.querySelector('.video-seek');
+            if (video) {
+                this.bindVideoListeners(video);
+            }
+            if (!this.canHydrateMedia || card.classList.contains('is-hidden')) {
+                return;
+            }
+            if (this.observer) {
+                this.observer.unobserve(card);
+                this.observer.observe(card);
+            } else {
+                this.hydrateCardIframe(card);
+                if (video) {
+                    this.hydrateVideo(video);
+                    video.play().catch(() => {});
+                }
+            }
+        });
     }
 }
 
@@ -920,35 +1123,34 @@ class VideoSeekController {
 let lenis;
 
 function initLenis() {
-    // Check if Lenis is available (from npm package)
     if (typeof Lenis !== 'undefined') {
         lenis = new Lenis({
-            duration: 1.2,
+            duration: 1.15,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             orientation: 'vertical',
             gestureOrientation: 'vertical',
             smoothWheel: true,
             wheelMultiplier: 1,
-            touchMultiplier: 2,
+            touchMultiplier: 1.8,
             infinite: false,
         });
 
-        // Connect Lenis to frame scroller
+        if (window.frameScrollerInstance?.isLoading) {
+            lenis.stop();
+        }
+
         lenis.on('scroll', (e) => {
-            // Update frame scroller with Lenis scroll values
             if (window.frameScrollerInstance) {
                 window.frameScrollerInstance.handleLenisScroll(e.scroll, e.progress);
             }
         });
 
-        // Animation frame loop for Lenis
         function raf(time) {
             lenis.raf(time);
             requestAnimationFrame(raf);
         }
         requestAnimationFrame(raf);
 
-        console.log('Lenis smooth scroll initialized');
         return lenis;
     } else {
         console.warn('Lenis not loaded, falling back to native scroll');
@@ -960,24 +1162,25 @@ function initLenis() {
 // WORKS GRID CONTROLLER (3:4 GRID & LOAD MORE)
 // ============================================
 class WorksGridController {
-    constructor(modalController, seekController) {
+    constructor(modalController, seekController, mouseEffects) {
         this.grid = document.getElementById('videoGrid');
         this.loadMoreBtn = document.getElementById('loadMoreWorksBtn');
         this.modalController = modalController;
         this.seekController = seekController;
+        this.mouseEffects = mouseEffects;
         if (!this.grid || !this.loadMoreBtn) return;
 
-        this.visibleCount = 10; // Initial 10 cards (2 rows of 5 columns on 1920x1080)
-        this.step = 10; // Load 10 cards per click (2 rows of 5 columns)
+        this.visibleCount = 10;
+        this.step = 10;
 
         this.init();
     }
 
     async init() {
-        await this.syncWorksData();
         this.cards = Array.from(this.grid.querySelectorAll('.video-card'));
         this.updateVisibility(false);
         this.loadMoreBtn.addEventListener('click', () => this.handleLoadMore());
+        await this.syncWorksData();
     }
 
     async syncWorksData() {
@@ -1015,7 +1218,7 @@ class WorksGridController {
 
         if (Array.isArray(works) && works.length > 0) {
             const now = Date.now();
-            const publishedOnly = works.filter(w => {
+            const publishedOnly = works.filter((w) => {
                 const sched = w.publishAt || w.publishedAt;
                 if (!sched) return true;
                 const ts = new Date(sched).getTime();
@@ -1028,31 +1231,29 @@ class WorksGridController {
     renderDynamicWorks(works) {
         this.grid.innerHTML = works.map((work, index) => {
             const ytId = work.youtubeId || parseYouTubeId(work.videoUrl);
-
-            // Checkbox takes priority; fallback to 7-day date calculation
             const isNew = work.isNewRelease === true || (work.isNewRelease !== false && isWithin7Days(work.publishedAt || work.publishAt));
-
             const thumb = work.thumbnailUrl || (ytId ? `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg` : '');
             const badgeText = isNew ? 'NEW' : (work.badge || '');
+            const isInitiallyHidden = index >= this.visibleCount;
 
             let mediaHtml = '';
             if (ytId) {
                 mediaHtml = `
                     <img class="card-thumb" src="${thumb}" alt="${work.title}" loading="lazy" onerror="if(this.src.indexOf('maxresdefault') !== -1) this.src='https://img.youtube.com/vi/${ytId}/hqdefault.jpg'">
-                    <iframe class="card-youtube-autoplay" src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&playsinline=1&rel=0&modestbranding=1" allow="autoplay; encrypted-media" loading="lazy" title="${work.title}"></iframe>
+                    <iframe class="card-youtube-autoplay" data-src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&playsinline=1&rel=0&modestbranding=1" allow="autoplay; encrypted-media" loading="lazy" title="${work.title}"></iframe>
                 `;
             } else if (thumb) {
                 mediaHtml = `<img class="card-thumb" src="${thumb}" alt="${work.title}" loading="lazy">`;
             } else {
                 mediaHtml = `
-                    <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                        <source src="${work.videoUrl}" type="video/mp4">
+                    <video class="video-seek" muted loop playsinline preload="none">
+                        <source data-src="${work.videoUrl}" type="video/mp4">
                     </video>
                 `;
             }
 
             return `
-                <div class="video-card ${isNew ? 'is-new-release' : ''}" 
+                <div class="video-card ${isNew ? 'is-new-release' : ''} ${isInitiallyHidden ? 'is-hidden' : ''}" 
                      data-video="${work.videoUrl || ''}" 
                      data-youtube="${ytId || ''}"
                      data-video-type="${ytId ? 'youtube' : 'mp4'}"
@@ -1081,15 +1282,12 @@ class WorksGridController {
             `;
         }).join('');
 
-        // Refresh bindings
         this.cards = Array.from(this.grid.querySelectorAll('.video-card'));
         this.updateVisibility(false);
-        if (this.modalController) {
-            this.modalController.bindCards();
-        }
-        if (this.seekController) {
-            this.seekController.rebind();
-        }
+        this.modalController?.bindCards();
+        this.seekController?.rebind();
+        this.mouseEffects?.bindCards();
+        window.scrollRevealInstance?.observeNew();
     }
 
     updateVisibility(animateNew = true) {
@@ -1121,6 +1319,8 @@ class WorksGridController {
         if (this.visibleCount < this.cards.length) {
             this.visibleCount += this.step;
             this.updateVisibility(true);
+            this.seekController?.rebind();
+            window.scrollRevealInstance?.observeNew();
         }
     }
 }
@@ -1129,45 +1329,24 @@ class WorksGridController {
 // INITIALIZE ALL CONTROLLERS
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Lenis smooth scroll first
-    initLenis();
-    
-    // Initialize scroll entrance (cinematic "Scroll to explore" animation)
-    new ScrollEntrance();
-    
-    // Initialize frame scroller
     const frameScroller = new FrameScroller();
     window.frameScrollerInstance = frameScroller;
-    
-    // Initialize navigation
+
+    initLenis();
+
+    new ScrollEntrance();
     new NavigationController();
 
-    // Initialize video seek controller (must be before modal)
     const videoSeekController = new VideoSeekController();
-    
-    // Initialize video modal
     const videoModalController = new VideoModalController();
+    const mouseEffects = new MouseEffects();
 
-    // Initialize works video grid and load more
-    new WorksGridController(videoModalController, videoSeekController);
-    
-    // Initialize FAQ
+    window.scrollRevealInstance = new ScrollReveal();
+    new WorksGridController(videoModalController, videoSeekController, mouseEffects);
+
     new FAQController();
-    
-    // Initialize scroll reveal
-    new ScrollReveal();
-    
-    // Initialize form
     new FormController();
-    
-    // Initialize parallax
     new ParallaxController();
-    
-    // Initialize marquee
-    new MarqueeController();
-    
-    // Initialize mouse effects
-    new MouseEffects();
 });
 
 // ============================================

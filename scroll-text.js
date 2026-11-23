@@ -1,6 +1,6 @@
 /**
  * Scroll Text Animation Component
- * Animates text on scroll with blur/fade effects
+ * Animates text on scroll with GPU-composited transforms and fade effects
  * Vanilla JS version inspired by React Bits
  */
 
@@ -10,7 +10,9 @@ class ScrollTextAnimation {
     this.texts = options.texts || [];
     this.triggerPoints = options.triggerPoints || [0.1, 0.4, 0.7];
     this.currentIndex = -1;
-    
+    this.items = [];
+    this.contents = [];
+
     this.init();
   }
 
@@ -20,23 +22,21 @@ class ScrollTextAnimation {
   }
 
   createTexts() {
-    // Create container for scroll texts
     this.container = document.createElement('div');
     this.container.className = 'scroll-text-container';
-    
+
     this.texts.forEach((textData, index) => {
       const textEl = document.createElement('div');
       textEl.className = `scroll-text-item scroll-text-${textData.position || 'center'}`;
       textEl.dataset.index = index;
-      
-      // Split text into words, then characters within words
+
       const words = textData.text.split(' ').map((word, wordIndex) => {
-        const chars = word.split('').map((char, charIndex) => 
-          `<span class="scroll-text-char" style="transition-delay: ${(wordIndex * 100) + (charIndex * 30)}ms">${char}</span>`
+        const chars = word.split('').map((char, charIndex) =>
+          `<span class="scroll-text-char" style="transition-delay: ${(wordIndex * 70) + (charIndex * 20)}ms">${char}</span>`
         ).join('');
         return `<span class="scroll-text-word">${chars}</span>`;
       }).join('<span class="scroll-text-space">&nbsp;</span>');
-      
+
       textEl.innerHTML = `
         <div class="scroll-text-content">
           ${textData.subtitle ? `<p class="scroll-text-subtitle">${textData.subtitle}</p>` : ''}
@@ -44,49 +44,44 @@ class ScrollTextAnimation {
           ${textData.cta ? `<a href="${textData.ctaLink || '#contact'}" class="scroll-text-cta">${textData.cta}</a>` : ''}
         </div>
       `;
-      
+
       this.container.appendChild(textEl);
+      this.items.push(textEl);
+      this.contents.push(textEl.querySelector('.scroll-text-content'));
     });
-    
+
     this.element.appendChild(this.container);
   }
 
   bindToFrameScroller() {
-    // Listen to scroll progress from FrameScroller
     window.addEventListener('frameScrollProgress', (e) => {
       this.handleScrollProgress(e.detail.progress);
-    });
+    }, { passive: true });
   }
 
   handleScrollProgress(progress) {
-    // Determine which text should be active based on scroll progress
     let activeIndex = -1;
-    
+
     for (let i = 0; i < this.triggerPoints.length; i++) {
       if (progress >= this.triggerPoints[i]) {
         activeIndex = i;
       }
     }
-    
-    // Don't go beyond available texts
+
     if (activeIndex >= this.texts.length) {
       activeIndex = this.texts.length - 1;
     }
-    
-    // Update active text
+
     if (activeIndex !== this.currentIndex) {
       this.setActiveText(activeIndex);
       this.currentIndex = activeIndex;
     }
-    
-    // Calculate individual text progress for animation
+
     this.updateTextAnimations(progress);
   }
 
   setActiveText(index) {
-    const items = this.container.querySelectorAll('.scroll-text-item');
-    
-    items.forEach((item, i) => {
+    this.items.forEach((item, i) => {
       if (i === index) {
         item.classList.add('is-active');
         item.classList.remove('was-active');
@@ -100,42 +95,34 @@ class ScrollTextAnimation {
   }
 
   updateTextAnimations(progress) {
-    const items = this.container.querySelectorAll('.scroll-text-item');
-    
-    items.forEach((item, index) => {
+    this.items.forEach((item, index) => {
+      const content = this.contents[index];
+      if (!content || !item.classList.contains('is-active')) return;
+
       const triggerPoint = this.triggerPoints[index] || 0;
       const nextTrigger = this.triggerPoints[index + 1] || 1;
-      
-      // Calculate local progress for this text (0 to 1 within its range)
-      let localProgress = (progress - triggerPoint) / (nextTrigger - triggerPoint);
+      const span = Math.max(0.001, nextTrigger - triggerPoint);
+
+      let localProgress = (progress - triggerPoint) / span;
       localProgress = Math.max(0, Math.min(1, localProgress));
-      
-      // Apply parallax and fade effects
-      const content = item.querySelector('.scroll-text-content');
-      if (content && item.classList.contains('is-active')) {
-        const translateY = (1 - localProgress) * 50;
-        const opacity = Math.min(1, localProgress * 2);
-        const blur = Math.max(0, 10 * (1 - localProgress));
-        
-        content.style.transform = `translateY(${translateY}px)`;
-        content.style.opacity = opacity;
-        content.style.filter = `blur(${blur}px)`;
-      }
+
+      const translateY = (1 - localProgress) * 40;
+      const opacity = Math.min(1, localProgress * 2.2);
+
+      content.style.transform = `translate3d(0, ${translateY.toFixed(2)}px, 0)`;
+      content.style.opacity = opacity.toFixed(3);
     });
   }
 }
 
-// Auto-initialize hero scroll texts
 document.addEventListener('DOMContentLoaded', () => {
   const heroSection = document.querySelector('.hero-section');
   if (heroSection) {
-    // Remove the original hero content or keep it for first frame
     const originalContent = heroSection.querySelector('.hero-content');
     if (originalContent) {
       originalContent.style.transition = 'opacity 0.5s ease';
     }
-    
-    // Create scroll text animation
+
     new ScrollTextAnimation(heroSection, {
       texts: [
         {
@@ -165,5 +152,4 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Export
 window.ScrollTextAnimation = ScrollTextAnimation;

@@ -87,15 +87,16 @@ export default function InvoicesPage() {
 
   const [previewInvoice, setPreviewInvoice] = useState<InvoiceRecord | null>(null);
 
+  const applyInvoicesPayload = (data: { invoices?: InvoiceRecord[]; summary?: InvoiceSummary }) => {
+    setInvoices(Array.isArray(data.invoices) ? data.invoices : []);
+    if (data.summary) setSummary(data.summary);
+  };
+
   const loadInvoices = async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/invoices", { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        setInvoices(Array.isArray(data.invoices) ? data.invoices : []);
-        if (data.summary) setSummary(data.summary);
-      }
+      if (res.ok) applyInvoicesPayload(await res.json());
     } catch {
       toast.error("Failed to load studio invoices.");
     } finally {
@@ -104,7 +105,21 @@ export default function InvoicesPage() {
   };
 
   useEffect(() => {
-    loadInvoices();
+    const controller = new AbortController();
+    fetch("/api/invoices", { credentials: "include", signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && !controller.signal.aborted) applyInvoicesPayload(data);
+      })
+      .catch((err) => {
+        if ((err as Error)?.name !== "AbortError") {
+          toast.error("Failed to load studio invoices.");
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, []);
 
   const updateStatus = async (id: string, nextStatus: InvoiceStatus) => {

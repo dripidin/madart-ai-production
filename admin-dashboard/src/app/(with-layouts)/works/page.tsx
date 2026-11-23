@@ -30,18 +30,29 @@ export default function WorksCatalogPage() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
-
-  const fetchWorks = () => {
-    setLoading(true);
-    fetch("/api/works?includeScheduled=true", { credentials: "include" })
-      .then((r) => (r.ok ? r.json() : []))
-      .then((data) => Array.isArray(data) && setWorks(data))
-      .catch(() => toast.error("Failed to load works"))
-      .finally(() => setLoading(false));
-  };
+  const [nowMs, setNowMs] = useState(0);
 
   useEffect(() => {
-    fetchWorks();
+    const controller = new AbortController();
+    fetch("/api/works?includeScheduled=true", {
+      credentials: "include",
+      signal: controller.signal,
+    })
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (controller.signal.aborted) return;
+        setNowMs(Date.now());
+        if (Array.isArray(data)) setWorks(data);
+      })
+      .catch((err) => {
+        if ((err as Error)?.name !== "AbortError") {
+          toast.error("Failed to load works");
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, []);
 
   const categories = useMemo(() => {
@@ -136,7 +147,9 @@ export default function WorksCatalogPage() {
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((work) => {
             const sched = work.publishAt || work.publishedAt;
-            const isScheduled = sched && new Date(sched).getTime() > Date.now();
+            const isScheduled = Boolean(
+              sched && nowMs > 0 && new Date(sched).getTime() > nowMs
+            );
             const ytId = work.youtubeId;
             const thumb = work.thumbnailUrl || getYoutubeThumb(ytId);
 

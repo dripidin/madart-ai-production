@@ -35,7 +35,7 @@ function useTooltip({
   onOpenChange: setControlledOpen,
 }: TooltipOptions = {}) {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(initialOpen);
-  const arrowRef = React.useRef(null);
+  const [arrowElement, setArrowElement] = React.useState<SVGSVGElement | null>(null);
 
   const open = controlledOpen ?? uncontrolledOpen;
   const setOpen = setControlledOpen ?? setUncontrolledOpen;
@@ -55,7 +55,7 @@ function useTooltip({
       }),
       shift({ padding: 5 }),
       arrow({
-        element: arrowRef,
+        element: arrowElement,
       }),
     ],
   });
@@ -79,9 +79,14 @@ function useTooltip({
     () => ({
       open,
       setOpen,
-      ...interactions,
-      ...data,
-      arrowRef,
+      setReference: data.refs.setReference,
+      setFloating: data.refs.setFloating,
+      floatingStyles: data.floatingStyles,
+      placement: data.placement,
+      floatingContext: data.context,
+      getReferenceProps: interactions.getReferenceProps,
+      getFloatingProps: interactions.getFloatingProps,
+      setArrowElement,
     }),
     [open, setOpen, interactions, data],
   );
@@ -113,19 +118,21 @@ export const TooltipTrigger = React.forwardRef<
   const context = useTooltipContext();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const childrenRef = (children as any).ref;
-  const ref = useMergeRefs([context.refs.setReference, propRef, childrenRef]);
+  const ref = useMergeRefs([context.setReference, propRef, childrenRef]);
 
   if (asChild && React.isValidElement(children)) {
     return React.cloneElement(
       children,
-      context.getReferenceProps({
+      {
+        ...context.getReferenceProps({
+          ...props,
+          ...(React.isValidElement(children) && typeof children.props === "object"
+            ? children.props
+            : {}),
+          "data-state": context.open ? "open" : "closed",
+        } as React.HTMLProps<Element>),
         ref,
-        ...props,
-        ...(React.isValidElement(children) && typeof children.props === "object"
-          ? children.props
-          : {}),
-        "data-state": context.open ? "open" : "closed",
-      } as React.HTMLProps<Element>),
+      } as React.HTMLProps<Element>,
     );
   }
 
@@ -144,23 +151,31 @@ export const TooltipContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<"div">
 >(function TooltipContent({ style, className, ...props }, propRef) {
-  const context = useTooltipContext();
-  const ref = useMergeRefs([context.refs.setFloating, propRef]);
+  const {
+    open,
+    placement,
+    floatingStyles,
+    floatingContext,
+    setFloating,
+    getFloatingProps,
+    setArrowElement,
+  } = useTooltipContext();
+  const ref = useMergeRefs([setFloating, propRef]);
 
-  if (!context.open) return null;
+  if (!open) return null;
 
-  const side = context.placement.split("-")[0];
+  const side = placement.split("-")[0];
 
   return (
     <FloatingPortal>
       <div
         ref={ref}
         style={{
-          ...context.floatingStyles,
+          ...floatingStyles,
           ...style,
         }}
         data-side={side}
-        {...context.getFloatingProps(props)}
+        {...getFloatingProps(props)}
         className={cn(
           "hidden rounded-lg border border-border-secondary bg-tooltip-background px-3 py-1.5 text-sm font-medium text-tooltip-text-color shadow-md sm:block",
           "duration-150 animate-in fade-in-0 zoom-in-95",
@@ -169,8 +184,8 @@ export const TooltipContent = React.forwardRef<
         )}
       >
         <FloatingArrow
-          ref={context.arrowRef}
-          context={context.context}
+          ref={setArrowElement}
+          context={floatingContext}
           className="fill-tooltip-background [&>path:last-of-type]:stroke-border-secondary"
           width={18}
           height={18}

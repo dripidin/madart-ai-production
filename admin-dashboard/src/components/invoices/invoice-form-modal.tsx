@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/tailgrids/core/button";
 import {
@@ -52,93 +52,102 @@ function emptyItem(idx = 0): InvoiceLineItem {
   };
 }
 
-export function InvoiceFormModal({
+export function InvoiceFormModal(props: InvoiceFormModalProps) {
+  if (!props.isOpen) return null;
+  const modalKey = `${props.mode}-${props.initialInvoice?.id ?? "new"}`;
+  return <InvoiceFormModalInner key={modalKey} {...props} />;
+}
+
+function InvoiceFormModalInner({
   isOpen,
   mode,
   initialInvoice,
   onClose,
   onSaved,
 }: InvoiceFormModalProps) {
-  const [invoiceNumber, setInvoiceNumber] = useState("");
-  const [fromName, setFromName] = useState("MadeArt AI Studio");
-  const [fromEmail, setFromEmail] = useState("hello@madeartagency.com");
-  const [fromAddress, setFromAddress] = useState("Creative AI Production Agency");
+  const isPrefilled = Boolean(initialInvoice && (mode === "edit" || mode === "duplicate"));
+  const [invoiceNumber, setInvoiceNumber] = useState(
+    isPrefilled && mode === "edit" ? initialInvoice!.invoiceNumber : ""
+  );
+  const [fromName, setFromName] = useState(
+    isPrefilled ? initialInvoice!.fromName || "MadeArt AI Studio" : "MadeArt AI Studio"
+  );
+  const [fromEmail, setFromEmail] = useState(
+    isPrefilled
+      ? initialInvoice!.fromEmail || "hello@madeartagency.com"
+      : "hello@madeartagency.com"
+  );
+  const [fromAddress, setFromAddress] = useState(
+    isPrefilled
+      ? initialInvoice!.fromAddress || "Creative AI Production Agency"
+      : "Creative AI Production Agency"
+  );
 
-  const [clientName, setClientName] = useState("");
-  const [clientCompany, setClientCompany] = useState("");
-  const [clientEmail, setClientEmail] = useState("");
-  const [clientAddress, setClientAddress] = useState("");
+  const [clientName, setClientName] = useState(
+    isPrefilled ? initialInvoice!.clientName || "" : ""
+  );
+  const [clientCompany, setClientCompany] = useState(
+    isPrefilled ? initialInvoice!.clientCompany || "" : ""
+  );
+  const [clientEmail, setClientEmail] = useState(
+    isPrefilled ? initialInvoice!.clientEmail || "" : ""
+  );
+  const [clientAddress, setClientAddress] = useState(
+    isPrefilled ? initialInvoice!.clientAddress || "" : ""
+  );
 
-  const [currency, setCurrency] = useState<InvoiceCurrency>("USD");
-  const [issueDate, setIssueDate] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [paymentTerms, setPaymentTerms] = useState(PAYMENT_TERMS_OPTIONS[0]);
-  const [status, setStatus] = useState<InvoiceStatus>("Draft");
-
-  const [items, setItems] = useState<InvoiceLineItem[]>([emptyItem(0)]);
-  const [taxRate, setTaxRate] = useState<number>(0);
-  const [discountAmount, setDiscountAmount] = useState<number>(0);
-  const [notes, setNotes] = useState("");
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (!isOpen) return;
+  const [currency, setCurrency] = useState<InvoiceCurrency>(
+    isPrefilled ? (initialInvoice!.currency as InvoiceCurrency) || "USD" : "USD"
+  );
+  const [issueDate, setIssueDate] = useState(() => {
     const today = new Date().toISOString().slice(0, 10);
+    return isPrefilled && mode !== "duplicate"
+      ? initialInvoice!.issueDate || today
+      : today;
+  });
+  const [dueDate, setDueDate] = useState(
+    isPrefilled ? initialInvoice!.dueDate || "" : ""
+  );
+  const [paymentTerms, setPaymentTerms] = useState(
+    isPrefilled
+      ? initialInvoice!.paymentTerms || PAYMENT_TERMS_OPTIONS[0]
+      : PAYMENT_TERMS_OPTIONS[0]
+  );
+  const [status, setStatus] = useState<InvoiceStatus>(
+    isPrefilled && mode !== "duplicate" ? initialInvoice!.status || "Draft" : "Draft"
+  );
 
-    if (initialInvoice && (mode === "edit" || mode === "duplicate")) {
-      setInvoiceNumber(mode === "edit" ? initialInvoice.invoiceNumber : "");
-      setFromName(initialInvoice.fromName || "MadeArt AI Studio");
-      setFromEmail(initialInvoice.fromEmail || "hello@madeartagency.com");
-      setFromAddress(initialInvoice.fromAddress || "Creative AI Production Agency");
-      setClientName(initialInvoice.clientName || "");
-      setClientCompany(initialInvoice.clientCompany || "");
-      setClientEmail(initialInvoice.clientEmail || "");
-      setClientAddress(initialInvoice.clientAddress || "");
-      setCurrency((initialInvoice.currency as InvoiceCurrency) || "USD");
-      setIssueDate(mode === "duplicate" ? today : initialInvoice.issueDate || today);
-      setDueDate(initialInvoice.dueDate || "");
-      setPaymentTerms(initialInvoice.paymentTerms || PAYMENT_TERMS_OPTIONS[0]);
-      setStatus(mode === "duplicate" ? "Draft" : initialInvoice.status || "Draft");
-      setItems(
-        Array.isArray(initialInvoice.items) && initialInvoice.items.length > 0
-          ? initialInvoice.items.map((it, i) => ({
-              ...it,
-              id: `li_${Date.now()}_${i}`,
-            }))
-          : [
-              {
-                id: `li_${Date.now()}_0`,
-                title: initialInvoice.description || "AI Commercial Production",
-                description: "",
-                qty: 1,
-                unitPrice: Number(initialInvoice.amount || 0),
-                total: Number(initialInvoice.amount || 0),
-              },
-            ]
-      );
-      setTaxRate(Number(initialInvoice.taxRate || 0));
-      setDiscountAmount(Number(initialInvoice.discountAmount || 0));
-      setNotes(initialInvoice.notes || "");
-    } else {
-      setInvoiceNumber("");
-      setFromName("MadeArt AI Studio");
-      setFromEmail("hello@madeartagency.com");
-      setFromAddress("Creative AI Production Agency");
-      setClientName("");
-      setClientCompany("");
-      setClientEmail("");
-      setClientAddress("");
-      setCurrency("USD");
-      setIssueDate(today);
-      setDueDate("");
-      setPaymentTerms(PAYMENT_TERMS_OPTIONS[0]);
-      setStatus("Draft");
-      setItems([emptyItem(0)]);
-      setTaxRate(0);
-      setDiscountAmount(0);
-      setNotes("Thank you for collaborating with MadeArt AI Studio.");
-    }
-  }, [isOpen, mode, initialInvoice]);
+  const [items, setItems] = useState<InvoiceLineItem[]>(() =>
+    isPrefilled
+      ? Array.isArray(initialInvoice!.items) && initialInvoice!.items.length > 0
+        ? initialInvoice!.items.map((it, i) => ({
+            ...it,
+            id: it.id || `li_${i + 1}`,
+          }))
+        : [
+            {
+              id: "li_0",
+              title: initialInvoice!.description || "AI Commercial Production",
+              description: "",
+              qty: 1,
+              unitPrice: Number(initialInvoice!.amount || 0),
+              total: Number(initialInvoice!.amount || 0),
+            },
+          ]
+      : [emptyItem(0)]
+  );
+  const [taxRate, setTaxRate] = useState<number>(
+    isPrefilled ? Number(initialInvoice!.taxRate || 0) : 0
+  );
+  const [discountAmount, setDiscountAmount] = useState<number>(
+    isPrefilled ? Number(initialInvoice!.discountAmount || 0) : 0
+  );
+  const [notes, setNotes] = useState(
+    isPrefilled
+      ? initialInvoice!.notes || ""
+      : "Thank you for collaborating with MadeArt AI Studio."
+  );
+  const [saving, setSaving] = useState(false);
 
   const totals = useMemo(() => {
     const subtotal = items.reduce(

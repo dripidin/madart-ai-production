@@ -23,19 +23,24 @@ export default function IntegrationsSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const loadSecrets = () => {
-    setLoading(true);
-    fetch("/api/secrets", { credentials: "include" })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (data?.gemini) setSecrets({ gemini: data.gemini });
-      })
-      .catch(() => toast.error("Failed to fetch Gemini AI settings."))
-      .finally(() => setLoading(false));
-  };
-
   useEffect(() => {
-    loadSecrets();
+    const controller = new AbortController();
+    fetch("/api/secrets", { credentials: "include", signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!controller.signal.aborted && data?.gemini) {
+          setSecrets({ gemini: data.gemini });
+        }
+      })
+      .catch((err) => {
+        if ((err as Error)?.name !== "AbortError") {
+          toast.error("Failed to fetch Gemini AI settings.");
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, []);
 
   const handleSave = async (e: React.FormEvent) => {

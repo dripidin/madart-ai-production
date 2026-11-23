@@ -50,8 +50,11 @@
 }
 
 html {
-    scroll-behavior: smooth;
     font-size: 16px;
+}
+
+body.preloader-active {
+    overflow: hidden;
 }
 
 body {
@@ -488,18 +491,20 @@ body {
     width: 0.3em;
 }
 
+.scroll-text-content {
+    will-change: transform, opacity;
+}
+
 .scroll-text-char {
     display: inline-block;
     opacity: 0;
     transform: translateY(20px);
-    filter: blur(10px);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .scroll-text-item.is-active .scroll-text-char {
     opacity: 1;
     transform: translateY(0);
-    filter: blur(0);
 }
 
 .scroll-text-cta {
@@ -2405,8 +2410,7 @@ body {
 /* High DPI / Retina Screens */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .frame-canvas {
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
+        image-rendering: auto;
     }
 }
 
@@ -2543,6 +2547,27 @@ section {
     letter-spacing: 0.05em;
     color: rgba(255, 255, 255, 0.6);
     font-family: monospace;
+}
+
+.preloader-skip {
+    margin-top: 1.5rem;
+    padding: 0.5rem 1.25rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 9999px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.3s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.preloader-skip:hover {
+    background: #ffffff;
+    color: #09090b;
+    border-color: #ffffff;
 }
 
 /* ============================================

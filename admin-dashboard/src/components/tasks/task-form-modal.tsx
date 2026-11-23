@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarGroup } from "@/components/tailgrids/core/avatar";
 import { Badge } from "@/components/tailgrids/core/badge";
@@ -35,7 +35,13 @@ interface TaskFormModalProps {
   onSaved: () => void;
 }
 
-export function TaskFormModal({
+export function TaskFormModal(props: TaskFormModalProps) {
+  if (!props.isOpen) return null;
+  const modalKey = `${props.mode}-${props.initialStatus ?? "todo"}-${props.initialTask?.id ?? "new"}`;
+  return <TaskFormModalInner key={modalKey} {...props} />;
+}
+
+function TaskFormModalInner({
   isOpen,
   mode,
   initialStatus = "todo",
@@ -43,65 +49,55 @@ export function TaskFormModal({
   onClose,
   onSaved,
 }: TaskFormModalProps) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [project, setProject] = useState(STUDIO_PROJECTS[0]);
-  const [status, setStatus] = useState<TaskStatus>("todo");
-  const [priority, setPriority] = useState<TaskPriority>("normal");
-  const [dueDate, setDueDate] = useState("");
-  const [estimatedHours, setEstimatedHours] = useState<string>("");
-  const [assigneesInput, setAssigneesInput] = useState("Bidjou Mohamed");
-  const [tagsInput, setTagsInput] = useState("");
-  const [subtasks, setSubtasks] = useState<TaskSubtask[]>([]);
+  const isPrefilled = Boolean(initialTask && (mode === "edit" || mode === "duplicate"));
+  const [title, setTitle] = useState(() =>
+    isPrefilled
+      ? mode === "duplicate"
+        ? `${initialTask!.title} (Copy)`
+        : initialTask!.title || ""
+      : ""
+  );
+  const [description, setDescription] = useState(
+    isPrefilled ? initialTask!.description || "" : ""
+  );
+  const [project, setProject] = useState(
+    isPrefilled ? initialTask!.project || STUDIO_PROJECTS[0] : STUDIO_PROJECTS[0]
+  );
+  const [status, setStatus] = useState<TaskStatus>(() =>
+    isPrefilled
+      ? mode === "duplicate"
+        ? "todo"
+        : initialTask!.status || "todo"
+      : initialStatus || "todo"
+  );
+  const [priority, setPriority] = useState<TaskPriority>(
+    isPrefilled ? initialTask!.priority || "normal" : "normal"
+  );
+  const [dueDate, setDueDate] = useState(isPrefilled ? initialTask!.dueDate || "" : "");
+  const [estimatedHours, setEstimatedHours] = useState<string>(
+    isPrefilled && initialTask!.estimatedHours ? String(initialTask!.estimatedHours) : ""
+  );
+  const [assigneesInput, setAssigneesInput] = useState(() =>
+    isPrefilled
+      ? Array.isArray(initialTask!.assignees) && initialTask!.assignees.length > 0
+        ? initialTask!.assignees.join(", ")
+        : initialTask!.assignee || "Bidjou Mohamed"
+      : "Bidjou Mohamed"
+  );
+  const [tagsInput, setTagsInput] = useState(() =>
+    isPrefilled && Array.isArray(initialTask!.tags) ? initialTask!.tags.join(", ") : ""
+  );
+  const [subtasks, setSubtasks] = useState<TaskSubtask[]>(() =>
+    isPrefilled && Array.isArray(initialTask!.subtasks)
+      ? initialTask!.subtasks.map((s, idx) => ({
+          id: s.id || `sub_${idx + 1}`,
+          title: s.title,
+          done: mode === "duplicate" ? false : Boolean(s.done),
+        }))
+      : []
+  );
   const [newSubtask, setNewSubtask] = useState("");
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    if (initialTask && (mode === "edit" || mode === "duplicate")) {
-      setTitle(
-        mode === "duplicate" ? `${initialTask.title} (Copy)` : initialTask.title || ""
-      );
-      setDescription(initialTask.description || "");
-      setProject(initialTask.project || STUDIO_PROJECTS[0]);
-      setStatus(mode === "duplicate" ? "todo" : initialTask.status || "todo");
-      setPriority(initialTask.priority || "normal");
-      setDueDate(initialTask.dueDate || "");
-      setEstimatedHours(
-        initialTask.estimatedHours ? String(initialTask.estimatedHours) : ""
-      );
-      setAssigneesInput(
-        Array.isArray(initialTask.assignees) && initialTask.assignees.length > 0
-          ? initialTask.assignees.join(", ")
-          : initialTask.assignee || "Bidjou Mohamed"
-      );
-      setTagsInput(
-        Array.isArray(initialTask.tags) ? initialTask.tags.join(", ") : ""
-      );
-      setSubtasks(
-        Array.isArray(initialTask.subtasks)
-          ? initialTask.subtasks.map((s, idx) => ({
-              id: `sub_${Date.now()}_${idx}`,
-              title: s.title,
-              done: mode === "duplicate" ? false : Boolean(s.done),
-            }))
-          : []
-      );
-      setNewSubtask("");
-    } else {
-      setTitle("");
-      setDescription("");
-      setProject(STUDIO_PROJECTS[0]);
-      setStatus(initialStatus || "todo");
-      setPriority("normal");
-      setDueDate("");
-      setEstimatedHours("");
-      setAssigneesInput("Bidjou Mohamed");
-      setTagsInput("");
-      setSubtasks([]);
-      setNewSubtask("");
-    }
-  }, [isOpen, mode, initialStatus, initialTask]);
 
   const parsedAssignees = assigneesInput
     .split(",")
