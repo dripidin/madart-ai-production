@@ -1,12 +1,15 @@
 {
-  "name": "madart-ai-production",
+  "name": "madeart-ai-production",
   "version": "1.0.0",
-  "description": "MADART - AI Production Website",
+  "description": "MadeArt - AI Production Agency",
   "private": true,
   "scripts": {
-    "dev": "npx serve .",
-    "build": "echo 'Static site - no build needed'",
-    "start": "npx serve ."
+    "dev": "node scripts/dev-server.js",
+    "dev:admin": "npm --prefix admin-dashboard run dev -- -p 3001",
+    "build": "npm --prefix admin-dashboard run build",
+    "start": "node scripts/dev-server.js",
+    "start:admin": "npm --prefix admin-dashboard run start -- -p 3001",
+    "test": "node scratch/test_suite.js"
   },
   "keywords": [
     "ai",
@@ -22,5 +25,8 @@
   },
   "devDependencies": {
     "serve": "^14.2.0"
+  },
+  "dependencies": {
+    "geoip-lite": "^2.0.3"
   }
 }

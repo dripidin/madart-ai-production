@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MADART - AI Production</title>
+    <title>MadeArt - AI Production</title>
+    <link rel="icon" type="image/webp" href="public/profile pic.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;700;800&display=swap" rel="stylesheet">
@@ -19,8 +20,23 @@
     <script src="card-nav.js"></script>
 </head>
 <body>
+    <!-- Session Preloader Overlay -->
+    <div id="preloader" class="preloader-overlay">
+        <div class="preloader-content">
+            <div class="preloader-brand">MadeArt AI</div>
+            <div class="preloader-sub">Loading Cinematic Experience</div>
+            <div class="preloader-bar-wrapper">
+                <div id="preloaderBar" class="preloader-bar"></div>
+            </div>
+            <div class="preloader-info">
+                <span id="preloaderCounter">0 / 327 frames</span>
+                <span id="preloaderPercent">0%</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Navigation - CardNav Component -->
-    <div data-card-nav></div>
+    <div data-card-nav data-card-nav-logo="public/images/madeart black logo wordmark.png" data-card-nav-logo-alt="MADE ART AGENCY"></div>
 
     <!-- Hero Section - 3D Frame Scrolling -->
     <section id="hero" class="hero-section">
@@ -47,265 +63,555 @@
             <h2 class="section-title">Selected <span class="light">Works</span></h2>
         </div>
         
-        <!-- ULTIMATE PRO MAX CINEMATIC GRID -->
-        <div class="cinematic-showcase">
-            <!-- Ambient Light Effects -->
-            <div class="ambient-glow top-left"></div>
-            <div class="ambient-glow bottom-right"></div>
-            
-            <!-- Gradient Overlays -->
-            <div class="floating-grid-gradient top"></div>
-            <div class="floating-grid-gradient bottom"></div>
-            
-            <!-- Column 1 - Hyper Speed Up -->
-            <div class="floating-column column-1" data-direction="up" data-speed="1.5">
-                <div class="column-content">
-                    <!-- Dreams After Noon - NEW -->
-                    <div class="video-card featured" data-video="public/videos/dreams-after-noon.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/dreams-after-noon.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon magnetic">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="card-badge">NEW</div>
+        <!-- RESPONSIVE 3:4 VIDEO GRID SHOWCASE -->
+        <div class="works-grid-wrapper">
+            <div class="video-grid" id="videoGrid">
+                <!-- Video 1 -->
+                <div class="video-card" data-video="public/videos/dreams-after-noon.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/dreams-after-noon.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
                         </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Dreams After Noon</h3>
-                            <p class="video-category">AI Short Film • Director's Cut</p>
+                        <div class="card-badge">NEW</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Dreams After Noon</h3>
+                        <p class="video-category">AI Short Film • Director's Cut</p>
+                    </div>
+                </div>
+
+                <!-- Video 2 -->
+                <div class="video-card" data-video="public/videos/Algerian historical movie.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Algerian historical movie.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                        <div class="card-badge">EPIC</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Echoes of Algiers</h3>
+                        <p class="video-category">AI Historical Epic</p>
+                    </div>
+                </div>
+
+                <!-- Video 3 -->
+                <div class="video-card" data-video="public/videos/galaxy-dreams.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/galaxy-dreams.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                        <div class="card-badge">AWARD</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Galaxy Dreams</h3>
+                        <p class="video-category">Samsung Competition Winner</p>
+                    </div>
+                </div>
+
+                <!-- Video 4 -->
+                <div class="video-card" data-video="public/videos/samsung video.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/samsung video.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
                         </div>
                     </div>
-                    <!-- Echoes of Algiers -->
-                    <div class="video-card" data-video="public/videos/Algerian historical movie.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/Algerian historical movie.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Neon Horizons</h3>
+                        <p class="video-category">Future Tech Vision</p>
+                    </div>
+                </div>
+
+                <!-- Video 5 -->
+                <div class="video-card" data-video="public/videos/first-vision.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/first-vision.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
                         </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Echoes of Algiers</h3>
-                            <p class="video-category">AI Historical Epic</p>
+                        <div class="card-badge">DEBUT</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">First Vision</h3>
+                        <p class="video-category">Genesis Creation • The Beginning</p>
+                    </div>
+                </div>
+
+                <!-- Video 6 -->
+                <div class="video-card" data-video="public/videos/ArcNova.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/ArcNova.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
                         </div>
                     </div>
-                    <!-- Galaxy Dreams - NEW -->
-                    <div class="video-card featured" data-video="public/videos/galaxy-dreams.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/galaxy-dreams.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon magnetic">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="card-badge">AWARD</div>
+                    <div class="video-info">
+                        <h3 class="video-title">Arc Genesis</h3>
+                        <p class="video-category">Brand Universe</p>
+                    </div>
+                </div>
+
+                <!-- Video 7 -->
+                <div class="video-card" data-video="public/videos/ai-symphony.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/ai-symphony.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
                         </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Galaxy Dreams</h3>
-                            <p class="video-category">Samsung Competition • Life Transformed</p>
+                        <div class="card-badge">HIT</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">AI Symphony</h3>
+                        <p class="video-category">Musical Visual Experience</p>
+                    </div>
+                </div>
+
+                <!-- Video 8 -->
+                <div class="video-card" data-video="public/videos/Aston Martin.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Aston Martin.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
                         </div>
                     </div>
-                    <!-- Neon Horizons -->
-                    <div class="video-card" data-video="public/videos/samsung video.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/samsung video.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Velocity Shadows</h3>
+                        <p class="video-category">Automotive Poetry</p>
+                    </div>
+                </div>
+
+                <!-- Video 9 -->
+                <div class="video-card" data-video="public/videos/pure-ai-art.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/pure-ai-art.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
                         </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Neon Horizons</h3>
-                            <p class="video-category">Future Tech Vision</p>
+                        <div class="card-badge">101% AI</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Pure AI Art</h3>
+                        <p class="video-category">Algerian Digital Masterpiece</p>
+                    </div>
+                </div>
+
+                <!-- Video 10 -->
+                <div class="video-card" data-video="public/videos/Work ai ad business.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Work ai ad business.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
                         </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Synthetic Minds</h3>
+                        <p class="video-category">AI Commercial</p>
+                    </div>
+                </div>
+
+                <!-- Video 11 -->
+                <div class="video-card" data-video="public/videos/Yves Saint Laurent.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Yves Saint Laurent.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Midnight in Paris</h3>
+                        <p class="video-category">Haute Couture AI</p>
+                    </div>
+                </div>
+
+                <!-- Video 12 -->
+                <div class="video-card" data-video="public/videos/2 - Higgsfield is offering 33 days of unlimited Seedance 2.5 generations.Create, test, iterate, and.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/2 - Higgsfield is offering 33 days of unlimited Seedance 2.5 generations.Create, test, iterate, and.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Seedance 2.5 Generation</h3>
+                        <p class="video-category">AI Motion Showcase</p>
+                    </div>
+                </div>
+
+                <!-- Video 13 -->
+                <div class="video-card" data-video="public/videos/BUDDY COP COMEDY 90sSorry @bidjou.mohamed.ai 😅Seedance 2.5 powered by higgsfield_ai AI Higgsf.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/BUDDY COP COMEDY 90sSorry @bidjou.mohamed.ai 😅Seedance 2.5 powered by higgsfield_ai AI Higgsf.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">90s Buddy Cop Comedy</h3>
+                        <p class="video-category">AI Narrative Short</p>
+                    </div>
+                </div>
+
+                <!-- Video 14 -->
+                <div class="video-card" data-video="public/videos/Cardio day just hit different when the gym motivation has teeth 🧟_♂️💨 He tripped, she saved hi.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Cardio day just hit different when the gym motivation has teeth 🧟_♂️💨 He tripped, she saved hi.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Gym Motivation Zombie</h3>
+                        <p class="video-category">Action Comedy AI</p>
+                    </div>
+                </div>
+
+                <!-- Video 15 -->
+                <div class="video-card" data-video="public/videos/Cinema Studio 4.0 is out.I pushed this challenge toward a cinematic interpretation of what happe.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Cinema Studio 4.0 is out.I pushed this challenge toward a cinematic interpretation of what happe.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                        <div class="card-badge">4.0 OUT</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Cinema Studio 4.0</h3>
+                        <p class="video-category">Cinematic AI Challenge</p>
+                    </div>
+                </div>
+
+                <!-- Video 16 -->
+                <div class="video-card" data-video="public/videos/Exploring the intersection of artificial intelligence and surrealist cinema. This piece focuses.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Exploring the intersection of artificial intelligence and surrealist cinema. This piece focuses.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Surrealist Cinema</h3>
+                        <p class="video-category">Experimental AI Art</p>
+                    </div>
+                </div>
+
+                <!-- Video 17 -->
+                <div class="video-card" data-video="public/videos/Fox, how can you love a devil 🦊👑Simple, friend... the devil feeds me caviar. 💅✨..When you.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Fox, how can you love a devil 🦊👑Simple, friend... the devil feeds me caviar. 💅✨..When you.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Fox & The Devil</h3>
+                        <p class="video-category">Dark Fairytale AI</p>
+                    </div>
+                </div>
+
+                <!-- Video 18 -->
+                <div class="video-card" data-video="public/videos/From the stillness of sleep…to quiet footsteps in the dark,a warm fire, and words that open door.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/From the stillness of sleep…to quiet footsteps in the dark,a warm fire, and words that open door.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Quiet Footsteps in the Dark</h3>
+                        <p class="video-category">Atmospheric AI Story</p>
+                    </div>
+                </div>
+
+                <!-- Video 19 -->
+                <div class="video-card" data-video="public/videos/He didnt come to take her soul. He came to offer a crown. 👑🔥Kill the king... and youll be q.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/He didnt come to take her soul. He came to offer a crown. 👑🔥Kill the king... and youll be q.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">The Offered Crown</h3>
+                        <p class="video-category">Fantasy Epic AI</p>
+                    </div>
+                </div>
+
+                <!-- Video 20 -->
+                <div class="video-card" data-video="public/videos/Here are 3 options written from a professional, first-person perspective, framing you as a direc.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Here are 3 options written from a professional, first-person perspective, framing you as a direc.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Director's Vision</h3>
+                        <p class="video-category">Commercial Concept</p>
+                    </div>
+                </div>
+
+                <!-- Video 21 -->
+                <div class="video-card" data-video="public/videos/Hi mom hi Dad Abandoned him as a baby. Came back 5 years later. Hes cooler than both of us comb.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Hi mom hi Dad Abandoned him as a baby. Came back 5 years later. Hes cooler than both of us comb.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Prodigal Reunion</h3>
+                        <p class="video-category">Dramatic Short</p>
+                    </div>
+                </div>
+
+                <!-- Video 22 -->
+                <div class="video-card" data-video="public/videos/Higgsfield is offering 33 days of unlimited Seedance 2.5 generations.Create, test, iterate, and.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Higgsfield is offering 33 days of unlimited Seedance 2.5 generations.Create, test, iterate, and.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Unlimited Iterations</h3>
+                        <p class="video-category">AI Tech Demo</p>
+                    </div>
+                </div>
+
+                <!-- Video 23 -->
+                <div class="video-card" data-video="public/videos/I never… lose.He never loses. He never has. 👑The king rises from his throne one final time —.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/I never… lose.He never loses. He never has. 👑The king rises from his throne one final time —.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">The King Rises</h3>
+                        <p class="video-category">Cinematic Legend</p>
+                    </div>
+                </div>
+
+                <!-- Video 24 -->
+                <div class="video-card" data-video="public/videos/No more 5-second stitching. No more character drift. 🎬🔥.We took Seedance 2.5 for a run inside.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/No more 5-second stitching. No more character drift. 🎬🔥.We took Seedance 2.5 for a run inside.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Seamless Character Drift</h3>
+                        <p class="video-category">Next-Gen AI Video</p>
+                    </div>
+                </div>
+
+                <!-- Video 25 -->
+                <div class="video-card" data-video="public/videos/No ritual. No theater. Just precision. She builds a machine out of pure Infinity power — every g.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/No ritual. No theater. Just precision. She builds a machine out of pure Infinity power — every g.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Pure Infinity Power</h3>
+                        <p class="video-category">Sci-Fi Machine</p>
+                    </div>
+                </div>
+
+                <!-- Video 26 -->
+                <div class="video-card" data-video="public/videos/POV- Its 2026 and youve achieved total immunity to morning nagging 😎📰 A full 30-second conti.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/POV- Its 2026 and youve achieved total immunity to morning nagging 😎📰 A full 30-second conti.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Immunity 2026</h3>
+                        <p class="video-category">Continuous One-Take AI</p>
+                    </div>
+                </div>
+
+                <!-- Video 27 -->
+                <div class="video-card" data-video="public/videos/The eclipse was supposed to last four minutes. The darkness never left. 🌑🔥 A crowd gathers on.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/The eclipse was supposed to last four minutes. The darkness never left. 🌑🔥 A crowd gathers on.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">The Eternal Eclipse</h3>
+                        <p class="video-category">Supernatural Thriller</p>
+                    </div>
+                </div>
+
+                <!-- Video 28 -->
+                <div class="video-card" data-video="public/videos/The night the sky fell over Oran, we didnt run — we rode. One ride, one meteorite, one toast on.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/The night the sky fell over Oran, we didnt run — we rode. One ride, one meteorite, one toast on.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                        <div class="card-badge">ORAN</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Meteorite Over Oran</h3>
+                        <p class="video-category">Algerian Sci-Fi Adventure</p>
+                    </div>
+                </div>
+
+                <!-- Video 29 -->
+                <div class="video-card" data-video="public/videos/They came with an offer he couldnt refuse — a black diamond from another universe, glowing pink.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/They came with an offer he couldnt refuse — a black diamond from another universe, glowing pink.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Black Diamond Offer</h3>
+                        <p class="video-category">Cosmic Crime Noir</p>
+                    </div>
+                </div>
+
+                <!-- Video 30 -->
+                <div class="video-card" data-video="public/videos/Warm lighting. White tablecloth. Golden fried chicken. Everything about this scene says fine din.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/Warm lighting. White tablecloth. Golden fried chicken. Everything about this scene says fine din.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Fine Dining Chicken</h3>
+                        <p class="video-category">Luxury Culinary Parody</p>
+                    </div>
+                </div>
+
+                <!-- Video 31 -->
+                <div class="video-card" data-video="public/videos/What if a drawing leaked out of your glass of water ✨ One continuous 15-second take inside a rea.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/What if a drawing leaked out of your glass of water ✨ One continuous 15-second take inside a rea.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Glass of Water VFX</h3>
+                        <p class="video-category">VFX AI One-Take</p>
+                    </div>
+                </div>
+
+                <!-- Video 32 -->
+                <div class="video-card" data-video="public/videos/When the $200 Chinese cow movie made by a mother and her son over 5 years (no story, hand-drawn.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/When the $200 Chinese cow movie made by a mother and her son over 5 years (no story, hand-drawn.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Hand-Drawn Odyssey</h3>
+                        <p class="video-category">Indie Animation Homage</p>
+                    </div>
+                </div>
+
+                <!-- Video 33 -->
+                <div class="video-card" data-video="public/videos/When your elevator ride turns into a full music video 🛗🔥Dropped a 20-sec AI rap video — one gu.mp4">
+                    <div class="video-wrapper">
+                        <video class="video-seek" autoplay muted loop playsinline preload="metadata">
+                            <source src="public/videos/When your elevator ride turns into a full music video 🛗🔥Dropped a 20-sec AI rap video — one gu.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-overlay">
+                            <div class="play-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+                        </div>
+                        <div class="card-badge">RAP</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">Elevator Music Video</h3>
+                        <p class="video-category">AI Rap One-Take</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Column 2 - Ultra Speed Down -->
-            <div class="floating-column column-2" data-direction="down" data-speed="1.8">
-                <div class="column-content">
-                    <!-- First Vision - NEW -->
-                    <div class="video-card featured" data-video="public/videos/first-vision.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/first-vision.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon magnetic">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="card-badge">DEBUT</div>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">First Vision</h3>
-                            <p class="video-category">Genesis Creation • The Beginning</p>
-                        </div>
-                    </div>
-                    <!-- Arc Genesis -->
-                    <div class="video-card" data-video="public/videos/ArcNova.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/ArcNova.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Arc Genesis</h3>
-                            <p class="video-category">Brand Universe</p>
-                        </div>
-                    </div>
-                    <!-- AI Symphony - NEW -->
-                    <div class="video-card featured" data-video="public/videos/ai-symphony.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/ai-symphony.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon magnetic">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="card-badge">HIT</div>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">AI Symphony</h3>
-                            <p class="video-category">Musical Visual Experience</p>
-                        </div>
-                    </div>
-                    <!-- Velocity Shadows -->
-                    <div class="video-card" data-video="public/videos/aston martin.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/aston martin.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Velocity Shadows</h3>
-                            <p class="video-category">Automotive Poetry</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Column 3 - Speed Up -->
-            <div class="floating-column column-3" data-direction="up" data-speed="1.2">
-                <div class="column-content">
-                    <!-- Pure AI Art - NEW -->
-                    <div class="video-card featured" data-video="public/videos/pure-ai-art.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/pure-ai-art.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon magnetic">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="card-badge">101% AI</div>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Pure AI Art</h3>
-                            <p class="video-category">Algerian Digital Masterpiece</p>
-                        </div>
-                    </div>
-                    <!-- Synthetic Minds -->
-                    <div class="video-card" data-video="public/videos/Work ai ad business.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/Work ai ad business.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Synthetic Minds</h3>
-                            <p class="video-category">AI Commercial</p>
-                        </div>
-                    </div>
-                    <!-- Midnight in Paris -->
-                    <div class="video-card" data-video="public/videos/Yves Saint Laurent.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/Yves Saint Laurent.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Midnight in Paris</h3>
-                            <p class="video-category">Haute Couture AI</p>
-                        </div>
-                    </div>
-                    <!-- Origin Story -->
-                    <div class="video-card" data-video="public/videos/ArcNova.mp4">
-                        <div class="video-wrapper">
-                            <video class="video-seek" autoplay muted loop playsinline preload="metadata">
-                                <source src="public/videos/ArcNova.mp4" type="video/mp4">
-                            </video>
-                            <div class="video-overlay">
-                                <div class="play-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Origin Story</h3>
-                            <p class="video-category">Brand Identity</p>
-                        </div>
-                    </div>
-                </div>
+            <!-- Load More Action -->
+            <div class="load-more-wrapper">
+                <button id="loadMoreWorksBtn" class="load-more-btn">
+                    <span>Load More Works</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </section>
@@ -317,18 +623,23 @@
             <div class="about-column">
                 <div class="about-content">
                     <h2 class="section-title">About <span class="light">Bidjou</span></h2>
-                    <div class="founder-info">
-                        <h3 class="founder-name">Bidjou</h3>
-                        <p class="founder-role">Founder & Creative Director</p>
+                    <div class="founder-card">
+                        <div class="founder-avatar-wrapper">
+                            <img src="public/profile pic.webp" alt="Bidjou Mohamed AI" class="founder-avatar">
+                        </div>
+                        <div class="founder-info">
+                            <h3 class="founder-name">Bidjou Mohamed</h3>
+                            <p class="founder-role">Founder & Creative Director • AI Director</p>
+                        </div>
                     </div>
                     <div class="bio-text">
                         <p>
                             Pioneering the intersection of artificial intelligence and visual storytelling, 
-                            Bidjou founded MADART to revolutionize how brands communicate in the digital age.
+                            Bidjou founded MadeArt to revolutionize how brands communicate in the digital age.
                         </p>
                         <p>
                             With a vision that merges cutting-edge AI technology with cinematic artistry, 
-                            MADART has partnered with global brands like Samsung, Yves Saint Laurent, 
+                            MadeArt has partnered with global brands like Samsung, Yves Saint Laurent, 
                             Aston Martin, and Binance to create immersive visual experiences that 
                             captivate audiences worldwide.
                         </p>
@@ -361,34 +672,43 @@
                     <h2 class="section-title">Get in <span class="light">Touch</span></h2>
                     <p class="contact-desc">Ready to transform your brand with AI-powered production?</p>
                     
-                    <form class="contact-form" id="contactForm">
-                        <div class="form-group">
-                            <input type="text" id="name" name="name" required placeholder=" ">
-                            <label for="name">Your Name</label>
+                    <form class="contact-form" id="contactForm" novalidate>
+                        <input type="text" id="hpWebsite" name="hp_website" autocomplete="off" tabindex="-1" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;pointer-events:none;">
+                        <div id="dynamicContactFields" class="dynamic-contact-fields">
+                            <div class="form-group">
+                                <input type="text" id="name" name="name" required placeholder=" ">
+                                <label for="name">Your Name</label>
+                                <span class="field-error" aria-live="polite"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" id="email" name="email" required placeholder=" ">
+                                <label for="email">Email Address</label>
+                                <span class="field-error" aria-live="polite"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="company" name="company" placeholder=" ">
+                                <label for="company">Company</label>
+                                <span class="field-error" aria-live="polite"></span>
+                            </div>
+                            <div class="form-group">
+                                <select id="project-type" name="project-type" required>
+                                    <option value="">Select Project Type</option>
+                                    <option value="commercial">Commercial Production</option>
+                                    <option value="brand">Brand Campaign</option>
+                                    <option value="fashion">Fashion & Luxury</option>
+                                    <option value="automotive">Automotive</option>
+                                    <option value="tech">Tech & Innovation</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <span class="field-error" aria-live="polite"></span>
+                            </div>
+                            <div class="form-group">
+                                <textarea id="message" name="message" rows="4" required placeholder=" "></textarea>
+                                <label for="message">Tell us about your project</label>
+                                <span class="field-error" aria-live="polite"></span>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <input type="email" id="email" name="email" required placeholder=" ">
-                            <label for="email">Email Address</label>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="company" name="company" placeholder=" ">
-                            <label for="company">Company</label>
-                        </div>
-                        <div class="form-group">
-                            <select id="project-type" name="project-type" required>
-                                <option value="">Select Project Type</option>
-                                <option value="commercial">Commercial Production</option>
-                                <option value="brand">Brand Campaign</option>
-                                <option value="fashion">Fashion & Luxury</option>
-                                <option value="automotive">Automotive</option>
-                                <option value="tech">Tech & Innovation</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <textarea id="message" name="message" rows="4" required placeholder=" "></textarea>
-                            <label for="message">Tell us about your project</label>
-                        </div>
+                        <p class="form-global-error" id="contactGlobalError" role="alert" style="display:none;"></p>
                         <button type="submit" class="submit-btn">
                             <span>Send Message</span>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -399,13 +719,31 @@
                     </form>
 
                     <div class="contact-links">
-                        <a href="mailto:hello@madart.ai" class="contact-link">
-                            <span>hello@madart.ai</span>
+                        <a href="mailto:hello@madeartagency.com" class="contact-link">
+                            <span>hello@madeartagency.com</span>
                         </a>
                         <div class="social-links">
-                            <a href="#" class="social-link">Instagram</a>
-                            <a href="#" class="social-link">LinkedIn</a>
-                            <a href="#" class="social-link">Behance</a>
+                            <a href="https://x.com/BidjouMohamedAi" target="_blank" rel="noopener noreferrer" class="social-link">X (Twitter)</a>
+                            <a href="https://www.instagram.com/bidjou.mohamed.ai/" target="_blank" rel="noopener noreferrer" class="social-link">Instagram</a>
+                            <a href="https://www.threads.net/@bidjou.mohamed.ai" target="_blank" rel="noopener noreferrer" class="social-link">Threads</a>
+                        </div>
+                    </div>
+
+                    <div class="cpp-section">
+                        <span class="cpp-label">CPP (Creative Production Partners)</span>
+                        <div class="cpp-badges" id="formCppBadges">
+                            <a href="https://x.com/YouArtStudio" target="_blank" rel="noopener noreferrer" class="cpp-badge">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="flex-shrink:0;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                <span>@YouArtStudio</span>
+                            </a>
+                            <a href="https://x.com/ImagineArt_X" target="_blank" rel="noopener noreferrer" class="cpp-badge">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="flex-shrink:0;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                <span>@ImagineArt_X</span>
+                            </a>
+                            <a href="https://x.com/yesand_ai" target="_blank" rel="noopener noreferrer" class="cpp-badge">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="flex-shrink:0;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                <span>@yesand_ai</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -417,7 +755,8 @@
     <div class="video-modal" id="videoModal">
         <div class="modal-close">&times;</div>
         <div class="modal-content">
-            <video id="modalVideo" controls></video>
+            <video id="modalVideo" controls playsinline></video>
+            <iframe id="modalIframe" class="modal-iframe" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen style="display:none;"></iframe>
         </div>
     </div>
 

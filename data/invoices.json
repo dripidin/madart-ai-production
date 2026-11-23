@@ -1,0 +1,36 @@
+[
+  {
+    "id": "inv_1794794056740_qlc",
+    "invoiceNumber": "MA-2026-101",
+    "fromName": "MadeArt AI Studio",
+    "fromEmail": "hello@madeartagency.com",
+    "fromAddress": "Creative AI Production Agency",
+    "clientName": "DRIP",
+    "clientCompany": "",
+    "clientEmail": "imedc5@gmail.com",
+    "clientAddress": "",
+    "description": "4K Video Marketing",
+    "items": [
+      {
+        "id": "li_1794865387988_0",
+        "title": "4K Video Marketing",
+        "description": "",
+        "qty": 1,
+        "unitPrice": 350,
+        "total": 350
+      }
+    ],
+    "subtotal": 350,
+    "taxRate": 0,
+    "taxAmount": 0,
+    "discountAmount": 0,
+    "amount": 350,
+    "currency": "USD",
+    "issueDate": "2026-11-16",
+    "dueDate": "2026-11-11",
+    "paymentTerms": "Upon Receipt",
+    "notes": "",
+    "status": "Sent",
+    "createdAt": "2026-11-16T01:54:16.740Z"
+  }
+]

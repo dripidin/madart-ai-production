@@ -20,11 +20,11 @@ class CardNav {
       ease: options.ease || 'power3.out',
       ...options
     };
-    
+
     this.isExpanded = false;
     this.isAnimating = false;
     this.cards = [];
-    
+
     this.init();
   }
 
@@ -37,7 +37,7 @@ class CardNav {
 
   render() {
     const { logo, logoAlt, items, baseColor, menuColor, buttonBgColor, buttonTextColor, buttonLabel, buttonLink } = this.options;
-    
+
     this.element.innerHTML = `
       <nav class="card-nav" style="background-color: ${baseColor}">
         <div class="card-nav-top">
@@ -51,7 +51,10 @@ class CardNav {
           </div>
 
           <a href="${buttonLink}" class="card-nav-cta-button" style="background-color: ${buttonBgColor}; color: ${buttonTextColor}">
-            ${buttonLabel}
+            <svg class="telegram-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.96 1.25-5.54 3.69-.52.36-1 .54-1.43.53-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.42-.88.03-.24.37-.49 1.02-.75 3.99-1.73 6.66-2.87 8.02-3.44 3.82-1.6 4.61-1.88 5.13-1.89.11 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.24-.04.42z"/>
+            </svg>
+            <span class="cta-text">${buttonLabel}</span>
           </a>
         </div>
 
@@ -74,7 +77,7 @@ class CardNav {
         </div>
       </nav>
     `;
-    
+
     this.element.className = 'card-nav-container';
   }
 
@@ -111,7 +114,7 @@ class CardNav {
     // Initial state - collapsed
     this.nav.style.height = '60px';
     this.nav.style.overflow = 'hidden';
-    
+
     // Hide cards initially
     this.cards.forEach(card => {
       card.style.opacity = '0';
@@ -121,38 +124,38 @@ class CardNav {
 
   calculateHeight() {
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    
+
     if (isMobile) {
       const topBar = 60;
       const padding = 16;
-      
+
       // Temporarily show content to measure
       const originalVisibility = this.content.style.visibility;
       const originalPointerEvents = this.content.style.pointerEvents;
       const originalPosition = this.content.style.position;
       const originalHeight = this.content.style.height;
-      
+
       this.content.style.visibility = 'visible';
       this.content.style.pointerEvents = 'auto';
       this.content.style.position = 'static';
       this.content.style.height = 'auto';
-      
+
       const contentHeight = this.content.scrollHeight;
-      
+
       this.content.style.visibility = originalVisibility;
       this.content.style.pointerEvents = originalPointerEvents;
       this.content.style.position = originalPosition;
       this.content.style.height = originalHeight;
-      
+
       return topBar + contentHeight + padding;
     }
-    
+
     return 260;
   }
 
   toggleMenu() {
     if (this.isAnimating) return;
-    
+
     if (this.isExpanded) {
       this.closeMenu();
     } else {
@@ -163,21 +166,21 @@ class CardNav {
   openMenu() {
     this.isAnimating = true;
     this.isExpanded = true;
-    
+
     // Update ARIA
     this.hamburger.setAttribute('aria-label', 'Close menu');
     this.content.setAttribute('aria-hidden', 'false');
-    
+
     // Add open classes
     this.hamburger.classList.add('open');
     this.nav.classList.add('open');
-    
+
     // Animate height
     const targetHeight = this.calculateHeight();
     this.animateHeight(this.nav, 60, targetHeight, 400, () => {
       this.isAnimating = false;
     });
-    
+
     // Animate cards
     this.cards.forEach((card, index) => {
       setTimeout(() => {
@@ -188,14 +191,14 @@ class CardNav {
 
   closeMenu() {
     this.isAnimating = true;
-    
+
     // Update ARIA
     this.hamburger.setAttribute('aria-label', 'Open menu');
     this.content.setAttribute('aria-hidden', 'true');
-    
+
     // Remove open classes
     this.hamburger.classList.remove('open');
-    
+
     // Animate cards out (reverse order)
     const cardArray = Array.from(this.cards).reverse();
     cardArray.forEach((card, index) => {
@@ -203,7 +206,7 @@ class CardNav {
         this.animateCard(card, false);
       }, index * 50);
     });
-    
+
     // Animate height
     setTimeout(() => {
       this.animateHeight(this.nav, this.nav.offsetHeight, 60, 300, () => {
@@ -216,24 +219,24 @@ class CardNav {
 
   animateHeight(element, from, to, duration, callback) {
     const startTime = performance.now();
-    
+
     const animate = (currentTime) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       // Ease out cubic
       const easeProgress = 1 - Math.pow(1 - progress, 3);
       const currentHeight = from + (to - from) * easeProgress;
-      
+
       element.style.height = currentHeight + 'px';
-      
+
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
         if (callback) callback();
       }
     };
-    
+
     requestAnimationFrame(animate);
   }
 
@@ -244,30 +247,30 @@ class CardNav {
     const endY = entering ? 0 : 30;
     const duration = 400;
     const startTime = performance.now();
-    
+
     const animate = (currentTime) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       // Ease out
       const easeProgress = 1 - Math.pow(1 - progress, 3);
       const currentOpacity = startOpacity + (endOpacity - startOpacity) * easeProgress;
       const currentY = startY + (endY - startY) * easeProgress;
-      
+
       card.style.opacity = currentOpacity;
       card.style.transform = `translateY(${currentY}px)`;
-      
+
       if (progress < 1) {
         requestAnimationFrame(animate);
       }
     };
-    
+
     requestAnimationFrame(animate);
   }
 
   handleResize() {
     if (!this.isExpanded) return;
-    
+
     // Recalculate and update height
     const newHeight = this.calculateHeight();
     this.nav.style.height = newHeight + 'px';
@@ -277,16 +280,16 @@ class CardNav {
 // Auto-initialize
 document.addEventListener('DOMContentLoaded', () => {
   const navElements = document.querySelectorAll('[data-card-nav]');
-  
+
   navElements.forEach(el => {
     // Parse options from data attributes
     const itemsData = el.dataset.cardNavItems;
     const items = itemsData ? JSON.parse(itemsData) : getDefaultNavItems();
-    
+
     new CardNav(el, {
       items,
-      logo: el.dataset.cardNavLogo || 'public/images/LOGO BLACK.png',
-      logoAlt: el.dataset.cardNavLogoAlt || 'MADEART',
+      logo: el.dataset.cardNavLogo || 'public/images/madeart black logo wordmark.png',
+      logoAlt: el.dataset.cardNavLogoAlt || 'MADE ART AGENCY',
       baseColor: el.dataset.cardNavBaseColor || 'rgba(255, 255, 255, 0.95)',
       menuColor: el.dataset.cardNavMenuColor || '#000000',
       buttonBgColor: el.dataset.cardNavButtonBg || '#111111',

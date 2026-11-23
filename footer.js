@@ -1,5 +1,5 @@
 /**
- * MADART Footer Component with Animated Logo
+ * MadeArt Footer Component with Animated Logo
  * Vanilla JS version of the animated footer
  */
 
@@ -17,13 +17,14 @@ class AnimatedFooter {
       'M666.76 108.138C674.817 108.138 681.722 105.162 685.997 97.8846H706.548C699.807 115.085 686.161 126 667.418 126C643.578 126 625 107.312 625 83.3308C625 60.177 643.249 40.1654 666.596 40.1654C691.915 40.1654 709.343 60.5077 709.343 85.15C709.343 86.4731 709.179 87.7962 709.179 89.1192H644.4C645.716 101.688 654.594 108.138 666.76 108.138ZM666.596 57.6962C656.402 57.6962 647.689 63.9808 645.058 74.0693H688.956C685.668 62.9885 677.94 57.6962 666.596 57.6962Z',
       'M775.138 110.619V126H700.166V114.092L747.517 55.3808H702.633V40H772.508V51.9077L724.17 110.619H775.138Z',
     ];
-    
+
     this.init();
   }
 
   init() {
     this.render();
     this.setupIntersectionObserver();
+    this.loadDynamicSettings();
   }
 
   render() {
@@ -49,33 +50,23 @@ class AnimatedFooter {
             
             <div class="footer-nav-col">
               <h3 class="footer-nav-title">SOCIAL</h3>
-              <div class="footer-social">
-                <a href="#" class="social-icon" aria-label="YouTube">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
-                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
-                  </svg>
-                </a>
-                <a href="#" class="social-icon" aria-label="Instagram">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-                  </svg>
-                </a>
-                <a href="#" class="social-icon" aria-label="TikTok">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
-                  </svg>
-                </a>
-              </div>
+              <ul class="footer-links">
+                <li><a href="https://x.com/BidjouMohamedAi" target="_blank" rel="noopener noreferrer">X (Twitter)</a></li>
+                <li><a href="https://www.instagram.com/bidjou.mohamed.ai/" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+                <li><a href="https://www.threads.net/@bidjou.mohamed.ai" target="_blank" rel="noopener noreferrer">Threads</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-nav-col">
+              <h3 class="footer-nav-title">CPP PARTNERS</h3>
+              <ul class="footer-links" id="footerCppList"></ul>
             </div>
           </div>
         </div>
         
         <div class="footer-logo-animation">
           <div class="footer-logo-wrapper">
-            <img src="public/images/WHITE LOGO.png" alt="MADART" class="footer-logo-image">
+            <img src="public/images/white logomark.png" alt="MADE ART AGENCY" class="footer-logo-image">
             <div class="footer-logo-text">
               <span class="footer-logo-line line-1">
                 ${['M', 'A', 'D', 'E', 'A', 'R', 'T'].map((char, index) => `
@@ -102,16 +93,102 @@ class AnimatedFooter {
         </div>
         
         <div class="footer-bottom">
-          <p class="footer-copyright">© 2026 MADART - AI Production. All Rights Reserved.</p>
+          <p class="footer-copyright">© 2026 MadeArt - AI Production. All Rights Reserved.</p>
           <a href="#" class="footer-privacy">Privacy Policy</a>
         </div>
       </div>
     `;
   }
 
+  async loadDynamicSettings() {
+    const DEFAULT_CPP = [
+      { handle: '@YouArtStudio', url: 'https://x.com/YouArtStudio', platform: 'x' },
+      { handle: '@ImagineArt_X', url: 'https://x.com/ImagineArt_X', platform: 'x' },
+      { handle: '@yesand_ai',    url: 'https://x.com/yesand_ai',    platform: 'x' },
+    ];
+
+    const getPlatformIcon = (platform) => {
+      const p = (platform || '').toLowerCase();
+      if (p === 'instagram') {
+        return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>`;
+      }
+      if (p === 'facebook') {
+        return `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="flex-shrink:0;"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`;
+      }
+      if (p === 'youtube') {
+        return `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="flex-shrink:0;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`;
+      }
+      if (p === 'x' || p === 'twitter') {
+        return `<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="flex-shrink:0;"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`;
+      }
+      return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`;
+    };
+
+    const detectPlatform = (p) => {
+      if (p && p.platform) return p.platform.toLowerCase();
+      const u = ((p && p.url) || '').toLowerCase();
+      if (u.includes('instagram.com') || u.includes('instagr.am')) return 'instagram';
+      if (u.includes('facebook.com') || u.includes('fb.com')) return 'facebook';
+      if (u.includes('youtube.com') || u.includes('youtu.be')) return 'youtube';
+      if (u.includes('x.com') || u.includes('twitter.com')) return 'x';
+      return 'website';
+    };
+
+    const esc = (str) => String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+    let cpp = DEFAULT_CPP;
+
+    try {
+      const res = await fetch('/api/settings');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.cpp) && data.cpp.length > 0) {
+          cpp = data.cpp;
+          localStorage.setItem('madeart_settings', JSON.stringify(data));
+        }
+      }
+    } catch (_) {
+      try {
+        const cached = JSON.parse(localStorage.getItem('madeart_settings') || localStorage.getItem('madart_settings') || '{}');
+        if (Array.isArray(cached.cpp) && cached.cpp.length > 0) {
+          cpp = cached.cpp;
+        }
+      } catch (__) {}
+    }
+
+    // Render footer CPP links
+    const list = document.getElementById('footerCppList');
+    if (list) {
+      list.innerHTML = cpp
+        .map(p => {
+          const platform = detectPlatform(p);
+          const icon = getPlatformIcon(platform);
+          return `<li><a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" class="footer-cpp-link">${icon}<span>${esc(p.handle)}</span></a></li>`;
+        })
+        .join('');
+    }
+
+    // Render contact form bottom CPP badges
+    const formBadges = document.getElementById('formCppBadges');
+    if (formBadges) {
+      formBadges.innerHTML = cpp
+        .map(p => {
+          const platform = detectPlatform(p);
+          const icon = getPlatformIcon(platform);
+          return `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" class="cpp-badge">${icon}<span>${esc(p.handle)}</span></a>`;
+        })
+        .join('');
+    }
+  }
+
   setupIntersectionObserver() {
     console.log('Setting up IntersectionObserver for footer');
-    
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
@@ -135,20 +212,20 @@ class AnimatedFooter {
     console.log('Animating logo, finding characters...');
     const chars = this.element.querySelectorAll('.footer-logo-char');
     console.log('Found characters:', chars.length);
-    
+
     if (chars.length === 0) {
       console.error('No characters found to animate');
       return;
     }
-    
+
     chars.forEach((char, index) => {
       const lineIndex = parseInt(char.dataset.line) || 1;
       const charIndex = parseInt(char.dataset.index) || 0;
       // Line 2 starts after line 1 completes
       const delay = lineIndex === 1 ? charIndex * 50 : (7 * 50) + (charIndex * 50);
-      
+
       console.log(`Animating char ${index} (line ${lineIndex}, char ${charIndex}) with delay ${delay}ms`);
-      
+
       // Staggered spring animation
       setTimeout(() => {
         console.log(`Starting animation for char ${index}`);
@@ -170,16 +247,16 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM loaded, looking for footer elements...');
   const footerElements = document.querySelectorAll('[data-animated-footer]');
   console.log('Found footer elements:', footerElements.length);
-  
+
   if (footerElements.length === 0) {
     console.error('No [data-animated-footer] elements found!');
   }
-  
+
   footerElements.forEach((el, i) => {
     console.log(`Initializing footer ${i}:`, el);
     new AnimatedFooter(el);
   });
-  
+
   // Fallback: trigger animation after 2 seconds if observer fails
   setTimeout(() => {
     console.log('Fallback: Checking if animations ran...');

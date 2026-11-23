@@ -1,0 +1,15 @@
+{
+  "cpp": [
+    { "handle": "@YouArtStudio",  "url": "https://x.com/YouArtStudio",  "platform": "x", "label": "YouArtStudio" },
+    { "handle": "@ImagineArt_X",  "url": "https://x.com/ImagineArt_X",  "platform": "x", "label": "ImagineArt_X" },
+    { "handle": "@yesand_ai",     "url": "https://x.com/yesand_ai",     "platform": "x", "label": "yesand_ai" }
+  ],
+  "site": {
+    "tagline": "AI Production Agency",
+    "contactEmail": "hello@madeartagency.com",
+    "instagramUrl": "https://www.instagram.com/bidjou.mohamed.ai/",
+    "xUrl": "https://x.com/BidjouMohamedAi",
+    "threadsUrl": "https://www.threads.net/@bidjou.mohamed.ai",
+    "linkedinUrl": ""
+  }
+}

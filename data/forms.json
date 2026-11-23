@@ -1,0 +1,167 @@
+{
+  "contact": [
+    {
+      "id": "name",
+      "name": "name",
+      "label": "Your Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter your full name",
+      "errorMessage": "Please enter your name."
+    },
+    {
+      "id": "email",
+      "name": "email",
+      "label": "Email Address",
+      "type": "email",
+      "required": true,
+      "placeholder": "you@company.com",
+      "errorMessage": "Please enter a valid email address."
+    },
+    {
+      "id": "company",
+      "name": "company",
+      "label": "Company",
+      "type": "text",
+      "required": false,
+      "placeholder": "Brand or Studio",
+      "errorMessage": ""
+    },
+    {
+      "id": "project-type",
+      "name": "project-type",
+      "label": "Project Type",
+      "type": "select",
+      "required": true,
+      "placeholder": "Select Project Type",
+      "errorMessage": "Please choose a project type.",
+      "options": [
+        { "value": "commercial", "label": "Commercial Production" },
+        { "value": "brand", "label": "Brand Campaign" },
+        { "value": "fashion", "label": "Fashion & Luxury" },
+        { "value": "automotive", "label": "Automotive" },
+        { "value": "tech", "label": "Tech & Innovation" },
+        { "value": "other", "label": "Other" }
+      ]
+    },
+    {
+      "id": "message",
+      "name": "message",
+      "label": "Tell us about your project",
+      "type": "textarea",
+      "required": true,
+      "placeholder": "Describe your timeline, creative goals, and deliverables...",
+      "errorMessage": "Please tell us a little about your project."
+    }
+  ],
+  "case-studies": [
+    {
+      "id": "name",
+      "name": "name",
+      "label": "Your Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "Your Name",
+      "errorMessage": "Please enter your name."
+    },
+    {
+      "id": "email",
+      "name": "email",
+      "label": "Work Email",
+      "type": "email",
+      "required": true,
+      "placeholder": "name@brand.com",
+      "errorMessage": "Valid email required."
+    },
+    {
+      "id": "case-interest",
+      "name": "case-interest",
+      "label": "Reference Campaign",
+      "type": "text",
+      "required": false,
+      "placeholder": "e.g., Samsung Galaxy AI",
+      "errorMessage": ""
+    },
+    {
+      "id": "brief",
+      "name": "brief",
+      "label": "Campaign Brief",
+      "type": "textarea",
+      "required": true,
+      "placeholder": "Share objectives & target launch window...",
+      "errorMessage": "Please share your campaign brief."
+    }
+  ],
+  "ai-production": [
+    {
+      "id": "name",
+      "name": "name",
+      "label": "Producer / Director Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "Your Name",
+      "errorMessage": "Please enter your name."
+    },
+    {
+      "id": "email",
+      "name": "email",
+      "label": "Email Address",
+      "type": "email",
+      "required": true,
+      "placeholder": "studio@company.com",
+      "errorMessage": "Please enter a valid email."
+    },
+    {
+      "id": "deliverable",
+      "name": "deliverable",
+      "label": "AI Pipeline Scope",
+      "type": "select",
+      "required": true,
+      "placeholder": "Select Production Pipeline",
+      "errorMessage": "Select a production pipeline.",
+      "options": [
+        { "value": "custom-lora", "label": "Custom Model / Brand LoRA" },
+        { "value": "ai-commercial", "label": "AI Commercial Synthesis" },
+        { "value": "hybrid-vfx", "label": "Hybrid 3D / Neural VFX" }
+      ]
+    },
+    {
+      "id": "message",
+      "name": "message",
+      "label": "Technical Specs & Notes",
+      "type": "textarea",
+      "required": true,
+      "placeholder": "Aspect ratio, frame rate, deadlines...",
+      "errorMessage": "Please describe technical requirements."
+    }
+  ],
+  "brand-films": [
+    {
+      "id": "name",
+      "name": "name",
+      "label": "Client Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "Your Name",
+      "errorMessage": "Please enter your name."
+    },
+    {
+      "id": "email",
+      "name": "email",
+      "label": "Email Address",
+      "type": "email",
+      "required": true,
+      "placeholder": "brand@maison.com",
+      "errorMessage": "Please enter a valid email."
+    },
+    {
+      "id": "treatment",
+      "name": "treatment",
+      "label": "Film Narrative & Tone",
+      "type": "textarea",
+      "required": true,
+      "placeholder": "Share your story direction, sonic mood, and runtime...",
+      "errorMessage": "Please share your film brief."
+    }
+  ]
+}

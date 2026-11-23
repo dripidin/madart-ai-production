@@ -71,3 +71,17 @@ pids
 # public/videos/*.mov
 # public/videos/*.mp4
 # public/frames/*.jpg
+
+.vercel
+
+# MadeArt Admin Secrets & Runtime Data
+data/secrets.json
+data/notifications.json
+uploads/
+admin-dashboard/.next/
+admin-dashboard/node_modules/
+admin-dashboard/out/
+
+# Local Archives & Design Mockups
+ui-main.zip
+stitch-mockups/
