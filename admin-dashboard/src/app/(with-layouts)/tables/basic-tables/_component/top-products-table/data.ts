@@ -1,3 +1,5 @@
+import { adminAssetPath } from "@/utils/asset-path";
+
 export const topProducts = [
   {
     name: "Keyboard H32",
@@ -5,7 +7,7 @@ export const topProducts = [
     price: "$269",
     sold: "1,284",
     profit: "$2442",
-    image: "/images/products/keyboard.png",
+    image: adminAssetPath("/images/products/keyboard.png"),
   },
   {
     name: "Mouse M12 Pro",
@@ -13,7 +15,7 @@ export const topProducts = [
     price: "$54",
     sold: "934",
     profit: "$1752",
-    image: "/images/products/mouse.png",
+    image: adminAssetPath("/images/products/mouse.png"),
   },
   {
     name: "Gaming Chair X5",
@@ -21,7 +23,7 @@ export const topProducts = [
     price: "$140",
     sold: "732",
     profit: "$1471",
-    image: "/images/products/gaming-chair.png",
+    image: adminAssetPath("/images/products/gaming-chair.png"),
   },
   {
     name: "Wireless Headset V7",
@@ -29,7 +31,7 @@ export const topProducts = [
     price: "$45",
     sold: "1120",
     profit: "$1400",
-    image: "/images/products/headset.png",
+    image: adminAssetPath("/images/products/headset.png"),
   },
   {
     name: "4K Monitor S24",
@@ -37,6 +39,6 @@ export const topProducts = [
     price: "$350",
     sold: "64",
     profit: "$590",
-    image: "/images/products/monitor.png",
+    image: adminAssetPath("/images/products/monitor.png"),
   },
 ];

@@ -1,7 +1,9 @@
+import { adminAssetPath } from "@/utils/asset-path";
+
 export const topChannelsData = [
   {
     name: "Google",
-    icon: "/images/social-icons/google.svg",
+    icon: adminAssetPath("/images/social-icons/google.svg"),
     visitors: "3.5K",
     revenues: "$4,220.00",
     sales: "3456",
@@ -9,7 +11,7 @@ export const topChannelsData = [
   },
   {
     name: "X.com",
-    icon: "/images/social-icons/x.svg",
+    icon: adminAssetPath("/images/social-icons/x.svg"),
     visitors: "3.5K",
     revenues: "$4,220.00",
     sales: "3456",
@@ -17,7 +19,7 @@ export const topChannelsData = [
   },
   {
     name: "Github",
-    icon: "/images/social-icons/github.svg",
+    icon: adminAssetPath("/images/social-icons/github.svg"),
     visitors: "3.5K",
     revenues: "$4,220.00",
     sales: "3456",
@@ -25,7 +27,7 @@ export const topChannelsData = [
   },
   {
     name: "Vimeo",
-    icon: "/images/social-icons/vimeo.svg",
+    icon: adminAssetPath("/images/social-icons/vimeo.svg"),
     visitors: "3.5K",
     revenues: "$4,220.00",
     sales: "3456",
@@ -33,7 +35,7 @@ export const topChannelsData = [
   },
   {
     name: "Facebook",
-    icon: "/images/social-icons/facebook.svg",
+    icon: adminAssetPath("/images/social-icons/facebook.svg"),
     visitors: "3.5K",
     revenues: "$4,220.00",
     sales: "3456",

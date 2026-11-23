@@ -1,3 +1,5 @@
+import { adminAssetPath } from "@/utils/asset-path";
+
 export const leadsReportData = [
   {
     id: "rep-001",
@@ -5,7 +7,7 @@ export const leadsReportData = [
       id: "user-101",
       fullName: "John Smith",
       roleTitle: "Sales Manager",
-      avatarUrl: "/images/user/jhon-smith.png",
+      avatarUrl: adminAssetPath("/images/user/jhon-smith.png"),
       emailAddress: "john.smith@company.com",
     },
     metrics: {
@@ -22,7 +24,7 @@ export const leadsReportData = [
       id: "user-102",
       fullName: "Alex Rodriguez",
       roleTitle: "Senior Account Executive",
-      avatarUrl: "/images/user/alex-rodriguez.png",
+      avatarUrl: adminAssetPath("/images/user/alex-rodriguez.png"),
       emailAddress: "alex.rodriguez@company.com",
     },
     metrics: {
@@ -39,7 +41,7 @@ export const leadsReportData = [
       id: "user-103",
       fullName: "Emily Johnson",
       roleTitle: "Account Executive",
-      avatarUrl: "/images/user/emily-johnson.png",
+      avatarUrl: adminAssetPath("/images/user/emily-johnson.png"),
       emailAddress: "emily.johnson@company.com",
     },
     metrics: {
@@ -56,7 +58,7 @@ export const leadsReportData = [
       id: "user-104",
       fullName: "Michael Brown",
       roleTitle: "Business Development Rep",
-      avatarUrl: "/images/user/michael-brown.png",
+      avatarUrl: adminAssetPath("/images/user/michael-brown.png"),
       emailAddress: "michael.brown@company.com",
     },
     metrics: {
@@ -73,7 +75,7 @@ export const leadsReportData = [
       id: "user-105",
       fullName: "Sarah Wilson",
       roleTitle: "Account Executive",
-      avatarUrl: "/images/user/sarah-wilson.png",
+      avatarUrl: adminAssetPath("/images/user/sarah-wilson.png"),
       emailAddress: "sarah.wilson@company.com",
     },
     metrics: {

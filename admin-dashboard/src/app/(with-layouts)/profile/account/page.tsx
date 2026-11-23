@@ -21,17 +21,18 @@ import {
 } from "@/components/tailgrids/core/select";
 import { TextArea } from "@/components/tailgrids/core/text-area";
 import { TextField } from "@/components/tailgrids/core/text-field";
+import { adminAssetPath } from "@/utils/asset-path";
 import Image from "next/image";
 import { FieldError, Form } from "react-aria-components";
 import { LogoutIcon, TrashIcon } from "./icons";
 
 const countryOptions = [
-  { value: "us", label: "United States", flag: "/images/flag/US.svg" },
-  { value: "ca", label: "Canada", flag: "/images/flag/CA.svg" },
-  { value: "fr", label: "France", flag: "/images/flag/FR.svg" },
-  { value: "au", label: "Australia", flag: "/images/flag/AU.svg" },
-  { value: "it", label: "Italy", flag: "/images/flag/IT.svg" },
-  { value: "in", label: "India", flag: "/images/flag/IN.svg" },
+  { value: "us", label: "United States", flag: adminAssetPath("/images/flag/US.svg") },
+  { value: "ca", label: "Canada", flag: adminAssetPath("/images/flag/CA.svg") },
+  { value: "fr", label: "France", flag: adminAssetPath("/images/flag/FR.svg") },
+  { value: "au", label: "Australia", flag: adminAssetPath("/images/flag/AU.svg") },
+  { value: "it", label: "Italy", flag: adminAssetPath("/images/flag/IT.svg") },
+  { value: "in", label: "India", flag: adminAssetPath("/images/flag/IN.svg") },
 ];
 
 export default function AccountPage() {
@@ -49,7 +50,7 @@ export default function AccountPage() {
         >
           <div className="flex items-center gap-4">
             <Avatar size="xxl">
-              <AvatarImage src="/images/user/jhon-smith.png" alt="Jhon Smith" />
+              <AvatarImage src={adminAssetPath("/images/user/jhon-smith.png")} alt="Jhon Smith" />
               <AvatarFallback>JS</AvatarFallback>
             </Avatar>
 

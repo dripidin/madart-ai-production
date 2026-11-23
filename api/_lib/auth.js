@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const COOKIE_NAME = 'madeart_admin';
 
 function getAdminPassword() {
-  return process.env.ADMIN_PASSWORD || 'madeart2026';
+  return process.env.ADMIN_PASSWORD || 'madeart2030';
 }
 
 function sha256(str) {

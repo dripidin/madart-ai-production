@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/tailgrids/core/dropdown";
+import { adminAssetPath } from "@/utils/asset-path";
 import { AltArrowDownIcon } from "@/utils/icon";
 import Link from "next/link";
 
@@ -34,7 +35,7 @@ interface UserProfile {
 const user: UserProfile = {
   name: "Bidjou Mohamed",
   email: "hello@madeartagency.com",
-  avatarUrl: "/images/user/jhon-smith.png",
+  avatarUrl: adminAssetPath("/images/user/jhon-smith.png"),
 };
 
 export function UserProfileButton() {
@@ -108,7 +109,7 @@ export function UserProfileButton() {
         <DropdownMenuItem
           onAction={() => {
             fetch("/api/auth", { method: "DELETE", credentials: "include" }).finally(() => {
-              window.location.href = "/login";
+              window.location.href = adminAssetPath("/login/");
             });
           }}
           className="m-1.5 w-auto cursor-pointer px-3 py-2.5"

@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GeoJSON, MapContainer, useMap } from "react-leaflet";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/tailgrids/core/card";
+import { adminAssetPath } from "@/utils/asset-path";
 import { PlusIcon, MinusIcon } from "@/utils/icon";
 
 interface CountryFeature {
@@ -80,7 +81,7 @@ export default function GeoIpWorldMapInner({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("/data/world.geojson")
+    fetch(adminAssetPath("/data/world.geojson"))
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("local miss"))))
       .then(setGeoData)
       .catch(() => {

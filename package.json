@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "node scripts/dev-server.js",
     "dev:admin": "npm --prefix admin-dashboard run dev -- -p 3001",
-    "build": "npm --prefix admin-dashboard run build",
-    "start": "node scripts/dev-server.js",
+    "build": "node scripts/build-admin.js",
+    "build:admin": "npm --prefix admin-dashboard run build",
+    "start": "node scripts/dev-server.js --static-admin",
     "start:admin": "npm --prefix admin-dashboard run start -- -p 3001",
     "test": "node scratch/test_suite.js"
   },

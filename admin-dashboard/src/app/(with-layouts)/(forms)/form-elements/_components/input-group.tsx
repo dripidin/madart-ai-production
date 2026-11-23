@@ -23,25 +23,26 @@ import {
   SelectValue,
 } from "@/components/tailgrids/core/select";
 import { TextField } from "@/components/tailgrids/core/text-field";
+import { adminAssetPath } from "@/utils/asset-path";
 import { Check, ChevronDown, Copy4, Minus, Plus } from "@tailgrids/icons";
 import Image from "next/image";
 import { useState } from "react";
 
 export const countryOptions = [
-  { value: "us", label: "United States", flag: "/images/flag/US.svg", code: "+1" },
-  { value: "ca", label: "Canada", flag: "/images/flag/CA.svg", code: "+1" },
-  { value: "fr", label: "France", flag: "/images/flag/FR.svg", code: "+33" },
-  { value: "au", label: "Australia", flag: "/images/flag/AU.svg", code: "+61" },
-  { value: "it", label: "Italy", flag: "/images/flag/IT.svg", code: "+39" },
-  { value: "in", label: "India", flag: "/images/flag/IN.svg", code: "+91" },
+  { value: "us", label: "United States", flag: adminAssetPath("/images/flag/US.svg"), code: "+1" },
+  { value: "ca", label: "Canada", flag: adminAssetPath("/images/flag/CA.svg"), code: "+1" },
+  { value: "fr", label: "France", flag: adminAssetPath("/images/flag/FR.svg"), code: "+33" },
+  { value: "au", label: "Australia", flag: adminAssetPath("/images/flag/AU.svg"), code: "+61" },
+  { value: "it", label: "Italy", flag: adminAssetPath("/images/flag/IT.svg"), code: "+39" },
+  { value: "in", label: "India", flag: adminAssetPath("/images/flag/IN.svg"), code: "+91" },
 ];
 
 const currencies = [
-  { code: "USD", flag: "/images/flag/US.svg" },
-  { code: "AUD", flag: "/images/flag/AU.svg" },
-  { code: "CAD", flag: "/images/flag/CA.svg" },
-  { code: "EUR", flag: "/images/flag/FR.svg" },
-  { code: "INR", flag: "/images/flag/IN.svg" },
+  { code: "USD", flag: adminAssetPath("/images/flag/US.svg") },
+  { code: "AUD", flag: adminAssetPath("/images/flag/AU.svg") },
+  { code: "CAD", flag: adminAssetPath("/images/flag/CA.svg") },
+  { code: "EUR", flag: adminAssetPath("/images/flag/FR.svg") },
+  { code: "INR", flag: adminAssetPath("/images/flag/IN.svg") },
 ];
 
 export default function InputGroupComponents() {
@@ -206,7 +207,7 @@ export default function InputGroupComponents() {
         <InputGroup className="w-full">
           <InputGroupAddon align="inline-start" className="pr-1 pl-3">
             <img
-              src="/images/products/mastercard.png"
+              src={adminAssetPath("/images/products/mastercard.png")}
               alt="Mastercard"
               className="h-auto w-7 object-contain"
             />

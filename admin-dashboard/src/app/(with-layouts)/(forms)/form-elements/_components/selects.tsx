@@ -9,16 +9,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/tailgrids/core/select";
+import { adminAssetPath } from "@/utils/asset-path";
 import { Close } from "@tailgrids/icons";
 import { useState } from "react";
 
 const countries = [
-  { code: "US", name: "United State", flag: "/images/flag/US.svg" },
-  { code: "AU", name: "Australia", flag: "/images/flag/AU.svg" },
-  { code: "CA", name: "Canada", flag: "/images/flag/CA.svg" },
-  { code: "FR", name: "France", flag: "/images/flag/FR.svg" },
-  { code: "IN", name: "India", flag: "/images/flag/IN.svg" },
-  { code: "IT", name: "Italy", flag: "/images/flag/IT.svg" },
+  { code: "US", name: "United State", flag: adminAssetPath("/images/flag/US.svg") },
+  { code: "AU", name: "Australia", flag: adminAssetPath("/images/flag/AU.svg") },
+  { code: "CA", name: "Canada", flag: adminAssetPath("/images/flag/CA.svg") },
+  { code: "FR", name: "France", flag: adminAssetPath("/images/flag/FR.svg") },
+  { code: "IN", name: "India", flag: adminAssetPath("/images/flag/IN.svg") },
+  { code: "IT", name: "Italy", flag: adminAssetPath("/images/flag/IT.svg") },
 ];
 
 const optionList = ["Bangladesh", "Singapore", "Malaysia", "Thailand"];

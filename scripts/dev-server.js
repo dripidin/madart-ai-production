@@ -5,12 +5,17 @@ const path = require('path');
 const ROOT_DIR = path.resolve(__dirname, '..');
 const PORT = Number(process.env.PORT || 3000);
 const ADMIN_DASHBOARD_URL = process.env.ADMIN_DASHBOARD_URL || 'http://localhost:3001';
+const SERVE_STATIC_ADMIN =
+  process.argv.includes('--static-admin') || process.env.SERVE_STATIC_ADMIN === '1';
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.js': 'application/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
+  '.geojson': 'application/geo+json; charset=utf-8',
+  '.txt': 'text/plain; charset=utf-8',
+  '.map': 'application/json; charset=utf-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
@@ -20,6 +25,7 @@ const MIME_TYPES = {
   '.webm': 'video/webm',
   '.woff2': 'font/woff2',
   '.woff': 'font/woff',
+  '.ttf': 'font/ttf',
   '.ico': 'image/x-icon',
 };
 
@@ -113,7 +119,10 @@ function serveStatic(req, res, parsedUrl) {
     return;
   }
 
-  const target = path.resolve(ROOT_DIR, '.' + reqPath);
+  let target = path.resolve(ROOT_DIR, '.' + reqPath);
+  if (target.startsWith(ROOT_DIR) && fs.existsSync(target) && fs.statSync(target).isDirectory()) {
+    target = path.join(target, 'index.html');
+  }
   if (!target.startsWith(ROOT_DIR) || !fs.existsSync(target) || fs.statSync(target).isDirectory()) {
     res.statusCode = 404;
     res.end('Not Found');
@@ -129,9 +138,13 @@ const server = http.createServer(async (req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
 
   if (parsedUrl.pathname === '/admin' || parsedUrl.pathname.startsWith('/admin/')) {
-    const suffix = parsedUrl.pathname.replace(/^\/admin/, '') || '/';
+    const hasStaticAdmin = fs.existsSync(path.join(ROOT_DIR, 'admin', 'index.html'));
+    if (SERVE_STATIC_ADMIN && hasStaticAdmin) {
+      serveStatic(req, res, parsedUrl);
+      return;
+    }
     res.statusCode = 302;
-    res.setHeader('Location', `${ADMIN_DASHBOARD_URL}${suffix}${parsedUrl.search}`);
+    res.setHeader('Location', `${ADMIN_DASHBOARD_URL}${parsedUrl.pathname}${parsedUrl.search}`);
     res.end();
     return;
   }

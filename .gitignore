@@ -81,6 +81,7 @@ uploads/
 admin-dashboard/.next/
 admin-dashboard/node_modules/
 admin-dashboard/out/
+/admin/
 
 # Local Archives & Design Mockups
 ui-main.zip
